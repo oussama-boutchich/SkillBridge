@@ -1,0 +1,237 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SkillBridge — Bridge the gap between education and your career. Sign in to your account.">
+    <title>SkillBridge | Sign In</title>
+
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="../../assets/css/variables.css">
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="../../assets/css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+</head>
+<body>
+
+<div class="auth-page">
+
+    <!-- ── Left Brand Panel ── -->
+    <div class="auth-panel">
+        <div class="auth-panel__brand">
+            <div class="auth-panel__logo">SB</div>
+            <span class="auth-panel__brand-name">SkillBridge</span>
+        </div>
+
+        <div class="auth-panel__content">
+            <h1 class="auth-panel__headline">
+                Your career journey starts here.
+            </h1>
+            <p class="auth-panel__subtext">
+                Connect with top companies, showcase your skills and certificates,
+                and land the internship or job that kickstarts your career.
+            </p>
+
+            <div class="auth-panel__features">
+                <div class="auth-panel__feature">
+                    <div class="auth-panel__feature-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <span>Build a professional student profile</span>
+                </div>
+                <div class="auth-panel__feature">
+                    <div class="auth-panel__feature-icon"><i class="fa-solid fa-briefcase"></i></div>
+                    <span>Browse internships, jobs &amp; challenges</span>
+                </div>
+                <div class="auth-panel__feature">
+                    <div class="auth-panel__feature-icon"><i class="fa-solid fa-trophy"></i></div>
+                    <span>Showcase verified certificates</span>
+                </div>
+                <div class="auth-panel__feature">
+                    <div class="auth-panel__feature-icon"><i class="fa-solid fa-bell"></i></div>
+                    <span>Get notified on application updates</span>
+                </div>
+            </div>
+        </div>
+
+        <p style="color:rgba(255,255,255,0.5); font-size: var(--font-size-xs);">
+            © 2026 SkillBridge. Empowering the next generation of professionals.
+        </p>
+    </div>
+
+    <!-- ── Right Form Panel ── -->
+    <div class="auth-form-container">
+        <div class="auth-form-box">
+
+            <p class="auth-form-box__eyebrow">Welcome back</p>
+            <h2 class="auth-form-box__title">Sign in to your account</h2>
+            <p class="auth-form-box__subtitle">
+                Don't have an account?
+                <a href="register.html">Create one for free →</a>
+            </p>
+
+            <!-- Global error alert -->
+            <div id="alert-error" class="alert alert--error" style="display:none;" role="alert">
+                <span class="alert__icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
+                <span class="alert__body" id="alert-error-text"></span>
+            </div>
+
+            <form id="login-form" class="auth-form" novalidate>
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        Email address <span class="required">*</span>
+                    </label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="form-control"
+                        placeholder="you@example.com"
+                        autocomplete="email"
+                        required
+                    >
+                    <span class="form-error" id="error-email" style="display:none;"></span>
+                </div>
+
+                <div class="form-group">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-2);">
+                        <label for="password" class="form-label" style="margin-bottom:0;">
+                            Password <span class="required">*</span>
+                        </label>
+                        <a href="#" style="font-size:var(--font-size-xs);">Forgot password?</a>
+                    </div>
+                    <div class="form-input-group">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="form-control"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        >
+                        <button type="button" class="form-input-group__suffix" id="toggle-password" aria-label="Show password">
+                            <i class="fa-solid fa-eye" id="toggle-password-icon"></i>
+                        </button>
+                    </div>
+                    <span class="form-error" id="error-password" style="display:none;"></span>
+                </div>
+
+                <button type="submit" id="btn-login" class="btn btn--primary btn--full btn--lg" style="margin-top:var(--space-2);">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="divider">or</div>
+
+            <p style="text-align:center; font-size:var(--font-size-xs); color:var(--color-text-muted);">
+                By signing in you agree to our
+                <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/utils.js"></script>
+<script>
+(async () => {
+    // If already logged in, redirect to dashboard
+    const user = await auth.check();
+    if (user) {
+        window.location.href = auth.dashboardUrl(user.role);
+    }
+})();
+
+// ── Password toggle ─────────────────────────────────────────
+document.getElementById('toggle-password').addEventListener('click', function () {
+    const input = document.getElementById('password');
+    const icon  = document.getElementById('toggle-password-icon');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'fa-solid fa-eye';
+    }
+});
+
+// ── Form submission ─────────────────────────────────────────
+document.getElementById('login-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const btn   = document.getElementById('btn-login');
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    // Clear previous errors
+    utils.setError('error-email', '');
+    utils.setError('error-password', '');
+    document.getElementById('alert-error').style.display = 'none';
+
+    // Client-side validation
+    let valid = true;
+    if (!email) {
+        utils.setError('error-email', 'Email address is required.');
+        document.getElementById('email').classList.add('is-invalid');
+        valid = false;
+    }
+    if (!password) {
+        utils.setError('error-password', 'Password is required.');
+        document.getElementById('password').classList.add('is-invalid');
+        valid = false;
+    }
+    if (!valid) return;
+
+    utils.setLoading(btn, true);
+
+    try {
+        const user = await api.post('/auth/login', { email, password });
+
+        // Save user to session storage
+        sessionStorage.setItem('sb_user', JSON.stringify(user));
+
+        toast.success('Welcome back!', `Signed in as ${user.full_name}`);
+
+        // Redirect to role-based dashboard
+        setTimeout(() => {
+            window.location.href = auth.dashboardUrl(user.role);
+        }, 600);
+
+    } catch (err) {
+        const alertEl  = document.getElementById('alert-error');
+        const alertText = document.getElementById('alert-error-text');
+        alertText.textContent = err.message || 'Sign in failed. Please try again.';
+        alertEl.style.display = 'flex';
+
+        // Field-level errors from server
+        if (err.errors) {
+            if (err.errors.email) {
+                utils.setError('error-email', err.errors.email);
+                document.getElementById('email').classList.add('is-invalid');
+            }
+            if (err.errors.password) {
+                utils.setError('error-password', err.errors.password);
+                document.getElementById('password').classList.add('is-invalid');
+            }
+        }
+    } finally {
+        utils.setLoading(btn, false);
+    }
+});
+
+// Clear invalid class on input
+['email', 'password'].forEach(id => {
+    document.getElementById(id).addEventListener('input', function () {
+        this.classList.remove('is-invalid');
+        utils.setError('error-' + id, '');
+    });
+});
+</script>
+
+</body>
+</html>

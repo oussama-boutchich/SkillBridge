@@ -1,0 +1,527 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SkillBridge — Edit your student profile.">
+    <title>SkillBridge | My Profile</title>
+
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../assets/css/variables.css">
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/layout.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+
+    <style>
+        .profile-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: var(--space-6);
+            align-items: start;
+        }
+
+        /* Profile card (left) */
+        .profile-id-card {
+            background:    var(--color-surface);
+            border:        1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding:       var(--space-6);
+            text-align:    center;
+            box-shadow:    var(--shadow-sm);
+            position:      sticky;
+            top: calc(var(--header-height) + var(--space-5));
+        }
+
+        .profile-avatar-wrapper {
+            position:   relative;
+            display:    inline-block;
+            margin-bottom: var(--space-4);
+        }
+
+        .profile-avatar-big {
+            width:         96px;
+            height:        96px;
+            border-radius: 50%;
+            background:    linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+            color:         #fff;
+            font-size:     var(--font-size-2xl);
+            font-weight:   var(--font-weight-bold);
+            display:       flex;
+            align-items:   center;
+            justify-content: center;
+            margin:        0 auto;
+        }
+
+        .profile-name {
+            font-size:   var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color:       var(--color-text-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .profile-role-badge {
+            display:       inline-flex;
+            align-items:   center;
+            gap:           var(--space-1);
+            background:    var(--color-primary-surface);
+            color:         var(--color-primary);
+            border-radius: var(--radius-full);
+            padding:       3px var(--space-3);
+            font-size:     var(--font-size-xs);
+            font-weight:   var(--font-weight-semibold);
+            margin-bottom: var(--space-4);
+        }
+
+        .profile-quick-stats {
+            display:  grid;
+            grid-template-columns: 1fr 1fr;
+            gap:      var(--space-2);
+            margin-top: var(--space-4);
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--color-border);
+        }
+
+        .profile-quick-stat {
+            text-align: center;
+        }
+
+        .profile-quick-stat__value {
+            font-size:   var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color:       var(--color-text-primary);
+        }
+
+        .profile-quick-stat__label {
+            font-size:   var(--font-size-xs);
+            color:       var(--color-text-muted);
+        }
+
+        /* Strength bar */
+        .strength-bar {
+            margin-top: var(--space-4);
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--color-border);
+        }
+
+        .strength-track {
+            height: 6px;
+            background: var(--color-border);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            margin: var(--space-2) 0;
+        }
+
+        .strength-fill {
+            height: 100%;
+            border-radius: var(--radius-full);
+            transition: width 1s ease;
+        }
+
+        /* Form card */
+        .form-card {
+            background:    var(--color-surface);
+            border:        1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding:       var(--space-6);
+            box-shadow:    var(--shadow-sm);
+            margin-bottom: var(--space-5);
+        }
+
+        .form-card__header {
+            display:         flex;
+            align-items:     center;
+            justify-content: space-between;
+            margin-bottom:   var(--space-5);
+            padding-bottom:  var(--space-4);
+            border-bottom:   1px solid var(--color-border);
+        }
+
+        .form-card__title {
+            font-size:   var(--font-size-md);
+            font-weight: var(--font-weight-semibold);
+            display:     flex;
+            align-items: center;
+            gap:         var(--space-2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+        }
+
+        @media (max-width: 900px) {
+            .profile-layout { grid-template-columns: 1fr; }
+            .profile-id-card { position: static; }
+        }
+
+        @media (max-width: 640px) {
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <a href="dashboard.html" class="sidebar__brand">
+            <div class="sidebar__brand-icon">SB</div>
+            <span class="sidebar__brand-text">SkillBridge</span>
+        </a>
+        <nav class="sidebar__nav">
+            <a href="dashboard.html"    class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-gauge-high"></i></span><span class="sidebar__text">Dashboard</span></a>
+            <a href="browse-jobs.html"  class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-magnifying-glass"></i></span><span class="sidebar__text">Browse Opportunities</span></a>
+            <a href="applications.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-file-lines"></i></span><span class="sidebar__text">My Applications</span></a>
+            <a href="certificates.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-trophy"></i></span><span class="sidebar__text">Certificates</span></a>
+            <span class="sidebar__nav-section">Account</span>
+            <a href="profile.html"       class="sidebar__link active"><span class="sidebar__icon"><i class="fa-solid fa-circle-user"></i></span><span class="sidebar__text">My Profile</span></a>
+            <a href="notifications.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-bell"></i></span><span class="sidebar__text">Notifications</span><span class="sidebar__badge" id="notif-badge" style="display:none;"></span></a>
+        </nav>
+        <div class="sidebar__footer">
+            <div class="sidebar__user">
+                <div class="sidebar__avatar" id="user-avatar">?</div>
+                <div class="sidebar__user-info">
+                    <div class="sidebar__user-name" id="user-name">Loading…</div>
+                    <div class="sidebar__user-role">Student</div>
+                </div>
+            </div>
+            <button class="btn btn--ghost btn--full" id="btn-logout" style="margin-top:var(--space-2); justify-content:flex-start; color:var(--color-danger); font-size:var(--font-size-xs);"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="app-main">
+        <header class="app-header">
+            <div class="header__left">
+                <button class="header__menu-btn" id="menu-btn"><i class="fa-solid fa-bars"></i></button>
+                <span class="header__page-title">My Profile</span>
+            </div>
+            <div class="header__right">
+                <button class="header__notif-btn" onclick="location.href='notifications.html'"><i class="fa-solid fa-bell"></i>
+                    <span class="header__notif-count" id="header-notif-count" style="display:none;"></span>
+                </button>
+                <button class="header__avatar-btn" onclick="location.href='profile.html'">
+                    <div class="header__avatar avatar avatar--md" id="header-avatar">?</div>
+                </button>
+            </div>
+        </header>
+
+        <main class="page-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">My Profile</h1>
+                    <p class="page-subtitle">Keep your profile up to date to attract the best opportunities.</p>
+                </div>
+            </div>
+
+            <div class="profile-layout">
+
+                <!-- Left: ID Card -->
+                <div>
+                    <div class="profile-id-card" id="profile-id-card">
+                        <div class="skeleton" style="width:96px; height:96px; border-radius:50%; margin:0 auto var(--space-4);"></div>
+                        <div class="skeleton" style="height:24px; width:70%; margin:0 auto var(--space-2);"></div>
+                        <div class="skeleton" style="height:20px; width:50%; margin:0 auto;"></div>
+                    </div>
+                </div>
+
+                <!-- Right: Forms -->
+                <div>
+
+                    <!-- Save alert -->
+                    <div id="save-alert" class="alert" style="display:none;">
+                        <span class="alert__icon" id="save-icon"></span>
+                        <span class="alert__body" id="save-msg"></span>
+                    </div>
+
+                    <!-- Personal Info -->
+                    <div class="form-card">
+                        <div class="form-card__header">
+                            <div class="form-card__title"><i class="fa-solid fa-circle-user"></i> Personal Information</div>
+                        </div>
+                        <form id="profile-form" novalidate>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="f-university" class="form-label">University</label>
+                                    <input type="text" id="f-university" class="form-control" placeholder="e.g. USTHB">
+                                </div>
+                                <div class="form-group">
+                                    <label for="f-field" class="form-label">Field of Study</label>
+                                    <input type="text" id="f-field" class="form-control" placeholder="e.g. Computer Science">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="f-grad" class="form-label">Graduation Year</label>
+                                    <input type="number" id="f-grad" class="form-control" placeholder="e.g. 2026" min="2020" max="2035">
+                                </div>
+                                <div class="form-group">
+                                    <label for="f-linkedin" class="form-label">LinkedIn URL</label>
+                                    <input type="url" id="f-linkedin" class="form-control" placeholder="https://linkedin.com/in/…">
+                                    <span class="form-error" id="err-linkedin" style="display:none;"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="f-bio" class="form-label">Bio</label>
+                                <textarea id="f-bio" class="form-control" placeholder="Tell companies about yourself, your goals, and what makes you stand out…" style="min-height:100px;"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="f-skills" class="form-label">Skills <span class="form-hint">(comma-separated)</span></label>
+                                <input type="text" id="f-skills" class="form-control" placeholder="e.g. PHP, JavaScript, MySQL, Python">
+                                <span class="form-hint">Example: PHP, JavaScript, MySQL, Python, Git</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="f-resume" class="form-label">Resume URL</label>
+                                <input type="url" id="f-resume" class="form-control" placeholder="https://drive.google.com/…">
+                                <span class="form-error" id="err-resume" style="display:none;"></span>
+                            </div>
+
+                            <div style="display:flex; justify-content:flex-end; gap:var(--space-3); margin-top:var(--space-4);">
+                                <button type="button" id="btn-reset" class="btn btn--secondary">Reset Changes</button>
+                                <button type="submit" id="btn-save" class="btn btn--primary"><i class="fa-solid fa-floppy-disk"></i> Save Profile</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Account Info (read-only) -->
+                    <div class="form-card">
+                        <div class="form-card__header">
+                            <div class="form-card__title"><i class="fa-solid fa-gear"></i> Account Details</div>
+                            <span class="badge badge--active">Active</span>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:var(--space-3); font-size:var(--font-size-sm);">
+                            <div style="display:flex; justify-content:space-between;">
+                                <span style="color:var(--color-text-muted);">Full Name</span>
+                                <span id="acc-name" style="font-weight:var(--font-weight-medium);">—</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between;">
+                                <span style="color:var(--color-text-muted);">Email</span>
+                                <span id="acc-email" style="font-weight:var(--font-weight-medium);">—</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between;">
+                                <span style="color:var(--color-text-muted);">Role</span>
+                                <span class="badge badge--internship">Student</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between;">
+                                <span style="color:var(--color-text-muted);">Member since</span>
+                                <span id="acc-joined" style="font-weight:var(--font-weight-medium);">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Danger Zone -->
+                    <div class="form-card" style="border-color:var(--color-danger-bg);">
+                        <div class="form-card__header">
+                            <div class="form-card__title" style="color:var(--color-danger);"><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone</div>
+                        </div>
+                        <p style="font-size:var(--font-size-sm); color:var(--color-text-muted); margin-bottom:var(--space-4);">
+                            Signing out will clear your session data from this browser.
+                        </p>
+                        <button class="btn btn--danger-outline" id="btn-signout">Sign Out of SkillBridge</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/utils.js"></script>
+<script>
+let currentUser  = null;
+let profileData  = null;
+let certCount    = 0;
+let appCount     = 0;
+
+(async () => {
+    currentUser = await auth.requireRole('student');
+    if (!currentUser) return;
+
+    const init = utils.initials(currentUser.full_name);
+    document.getElementById('user-avatar').textContent   = init;
+    document.getElementById('user-name').textContent     = currentUser.full_name;
+    document.getElementById('header-avatar').textContent = init;
+
+    // Account info
+    document.getElementById('acc-name').textContent  = currentUser.full_name;
+    document.getElementById('acc-email').textContent = currentUser.email;
+
+    // Notif
+    try {
+        const n = await api.get('/notifications');
+        if (n.unread > 0) {
+            document.getElementById('notif-badge').style.display         = '';
+            document.getElementById('notif-badge').textContent           = n.unread;
+            document.getElementById('header-notif-count').style.display  = '';
+            document.getElementById('header-notif-count').textContent    = n.unread;
+        }
+    } catch {}
+
+    // Parallel loads
+    const [profileRes, certsRes, appsRes] = await Promise.allSettled([
+        api.get(`/profiles/student/${currentUser.user_id}`),
+        api.get('/certificates'),
+        api.get('/applications/my'),
+    ]);
+
+    if (profileRes.status === 'fulfilled') {
+        profileData = profileRes.value;
+        fillForm(profileData);
+        renderIdCard(profileData);
+        if (profileData.created_at) {
+            document.getElementById('acc-joined').textContent = utils.formatDate(profileData.created_at);
+        }
+    }
+
+    if (certsRes.status === 'fulfilled') certCount = (certsRes.value || []).length;
+    if (appsRes.status  === 'fulfilled') appCount  = (appsRes.value  || []).length;
+
+    if (profileData) renderIdCard(profileData); // Re-render with counts
+})();
+
+document.getElementById('menu-btn').addEventListener('click', () =>
+    document.getElementById('sidebar').classList.toggle('open'));
+document.getElementById('btn-logout').addEventListener('click',   async () => await auth.logout());
+document.getElementById('btn-signout').addEventListener('click',  async () => await auth.logout());
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+    if (profileData) fillForm(profileData);
+});
+
+// Profile form submit
+document.getElementById('profile-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = document.getElementById('btn-save');
+
+    const linkedin = document.getElementById('f-linkedin').value.trim();
+    const resume   = document.getElementById('f-resume').value.trim();
+
+    // Simple URL check
+    utils.setError('err-linkedin', '');
+    utils.setError('err-resume', '');
+    let valid = true;
+    if (linkedin && !/^https?:\/\/.+/.test(linkedin)) {
+        utils.setError('err-linkedin', 'Must be a valid URL starting with https://');
+        valid = false;
+    }
+    if (resume && !/^https?:\/\/.+/.test(resume)) {
+        utils.setError('err-resume', 'Must be a valid URL starting with https://');
+        valid = false;
+    }
+    if (!valid) return;
+
+    utils.setLoading(btn, true);
+
+    const payload = {
+        university:      document.getElementById('f-university').value.trim() || null,
+        field_of_study:  document.getElementById('f-field').value.trim()      || null,
+        graduation_year: document.getElementById('f-grad').value              || null,
+        linkedin_url:    linkedin || null,
+        bio:             document.getElementById('f-bio').value.trim()        || null,
+        skills:          document.getElementById('f-skills').value.trim()     || null,
+        resume_url:      resume  || null,
+    };
+
+    try {
+        await api.put('/profiles/student', payload);
+
+        // Update local state
+        profileData = { ...profileData, ...payload };
+
+        const alert = document.getElementById('save-alert');
+        alert.className = 'alert alert--success';
+        alert.style.display = 'flex';
+        document.getElementById('save-icon').textContent = '<i class="fa-solid fa-check"></i>';
+        document.getElementById('save-msg').textContent  = 'Profile updated successfully!';
+
+        renderIdCard(profileData);
+        toast.success('Saved!', 'Your profile has been updated.');
+
+        setTimeout(() => { alert.style.display = 'none'; }, 3000);
+
+    } catch (err) {
+        const alert = document.getElementById('save-alert');
+        alert.className = 'alert alert--error';
+        alert.style.display = 'flex';
+        document.getElementById('save-icon').textContent = '<i class="fa-solid fa-triangle-exclamation"></i>';
+        document.getElementById('save-msg').textContent  = err.message || 'Failed to save profile.';
+        toast.error('Save Failed', err.message || 'Please try again.');
+    } finally {
+        utils.setLoading(btn, false);
+    }
+});
+
+function fillForm(p) {
+    document.getElementById('f-university').value = p.university      || '';
+    document.getElementById('f-field').value      = p.field_of_study  || '';
+    document.getElementById('f-grad').value       = p.graduation_year || '';
+    document.getElementById('f-linkedin').value   = p.linkedin_url    || '';
+    document.getElementById('f-bio').value        = p.bio             || '';
+    document.getElementById('f-skills').value     = p.skills          || '';
+    document.getElementById('f-resume').value     = p.resume_url      || '';
+}
+
+function renderIdCard(p) {
+    const fields    = ['university','field_of_study','bio','skills','linkedin_url'];
+    const filled    = fields.filter(f => p[f] && String(p[f]).trim()).length;
+    const pct       = Math.round((filled / fields.length) * 100);
+    const clr       = pct >= 80 ? 'var(--color-success)' : pct >= 40 ? 'var(--color-warning)' : 'var(--color-danger)';
+    const init      = utils.initials(currentUser.full_name);
+
+    document.getElementById('profile-id-card').innerHTML = `
+        <div class="profile-avatar-big">${init}</div>
+        <div class="profile-name" style="margin-top:var(--space-3);">${utils.escapeHtml(currentUser.full_name)}</div>
+        <div class="profile-role-badge"><i class="fa-solid fa-graduation-cap"></i> Student</div>
+
+        ${p.university ? `<p style="font-size:var(--font-size-sm); color:var(--color-text-muted);">${utils.escapeHtml(p.university)}</p>` : ''}
+        ${p.field_of_study ? `<p style="font-size:var(--font-size-xs); color:var(--color-text-muted); margin-top:2px;">${utils.escapeHtml(p.field_of_study)}</p>` : ''}
+
+        <div class="profile-quick-stats">
+            <div class="profile-quick-stat">
+                <div class="profile-quick-stat__value">${certCount}</div>
+                <div class="profile-quick-stat__label">Certs</div>
+            </div>
+            <div class="profile-quick-stat">
+                <div class="profile-quick-stat__value">${appCount}</div>
+                <div class="profile-quick-stat__label">Applied</div>
+            </div>
+        </div>
+
+        <div class="strength-bar">
+            <div style="display:flex; justify-content:space-between; font-size:var(--font-size-xs); color:var(--color-text-muted);">
+                <span>Profile Strength</span>
+                <span style="font-weight:var(--font-weight-bold); color:${clr};">${pct}%</span>
+            </div>
+            <div class="strength-track">
+                <div class="strength-fill" style="width:${pct}%; background:${clr};"></div>
+            </div>
+            <p style="font-size:var(--font-size-xs); color:var(--color-text-muted); margin-top:4px;">
+                ${pct < 100 ? 'Complete your profile to attract more companies.' : '<i class="fa-solid fa-check"></i> Your profile is complete!'}
+            </p>
+        </div>
+
+        ${p.linkedin_url ? `
+        <div style="margin-top:var(--space-4);">
+            <a href="${utils.escapeHtml(p.linkedin_url)}" target="_blank" class="btn btn--outline btn--sm btn--full">
+                <i class="fa-brands fa-linkedin"></i> View LinkedIn
+            </a>
+        </div>` : ''}
+
+        ${p.resume_url ? `
+        <div style="margin-top:var(--space-2);">
+            <a href="${utils.escapeHtml(p.resume_url)}" target="_blank" class="btn btn--secondary btn--sm btn--full">
+                <i class="fa-solid fa-file-lines"></i> View Resume
+            </a>
+        </div>` : ''}
+    `;
+}
+</script>
+
+</body>
+</html>

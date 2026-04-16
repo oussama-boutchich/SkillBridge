@@ -1,0 +1,351 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SkillBridge — Review and manage applicants for your postings.">
+    <title>SkillBridge | Applicants</title>
+
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../assets/css/variables.css">
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/layout.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+
+    <style>
+        .applicant-card {
+            background:    var(--color-surface);
+            border:        1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding:       var(--space-5);
+            display:       grid;
+            grid-template-columns: auto 1fr auto;
+            gap:           var(--space-4);
+            align-items:   start;
+            transition:    box-shadow var(--transition-fast), border-color var(--transition-fast);
+        }
+
+        .applicant-card:hover {
+            box-shadow:   var(--shadow-md);
+            border-color: var(--color-primary-border);
+        }
+
+        .applicant-card__avatar {
+            width:         52px;
+            height:        52px;
+            border-radius: 50%;
+            background:    linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+            color:         #fff;
+            font-size:     var(--font-size-md);
+            font-weight:   var(--font-weight-bold);
+            display:       flex;
+            align-items:   center;
+            justify-content: center;
+            flex-shrink:   0;
+        }
+
+        .applicant-card__name {
+            font-size:   var(--font-size-md);
+            font-weight: var(--font-weight-semibold);
+            color:       var(--color-text-primary);
+        }
+
+        .applicant-card__meta {
+            font-size:  var(--font-size-sm);
+            color:      var(--color-text-muted);
+            margin-top: 2px;
+        }
+
+        .applicant-card__post {
+            font-size:   var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+            color:       var(--color-primary);
+            background:  var(--color-primary-surface);
+            border-radius: var(--radius-sm);
+            padding:     2px var(--space-2);
+            display:     inline-block;
+            margin-top:  var(--space-2);
+        }
+
+        .applicant-card__cover {
+            margin-top:  var(--space-3);
+            padding:     var(--space-3);
+            background:  var(--color-surface-low);
+            border-radius: var(--radius-md);
+            font-size:   var(--font-size-sm);
+            color:       var(--color-text-secondary);
+            line-height: 1.6;
+            border-left: 3px solid var(--color-primary-border);
+        }
+
+        .applicant-actions {
+            display:        flex;
+            flex-direction: column;
+            gap:            var(--space-2);
+            align-items:    flex-end;
+        }
+
+        .post-selector {
+            background:    var(--color-surface);
+            border:        1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding:       var(--space-4) var(--space-5);
+            margin-bottom: var(--space-5);
+            display:       flex;
+            align-items:   center;
+            gap:           var(--space-4);
+            flex-wrap:     wrap;
+        }
+
+        .apps-list { display: flex; flex-direction: column; gap: var(--space-4); }
+
+        @media (max-width: 640px) {
+            .applicant-card { grid-template-columns: auto 1fr; }
+            .applicant-actions { flex-direction: row; flex-wrap: wrap; justify-content: flex-start; margin-top: var(--space-2); grid-column: 1/-1; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+</head>
+<body>
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <a href="dashboard.html" class="sidebar__brand">
+            <div class="sidebar__brand-icon">SB</div>
+            <span class="sidebar__brand-text">SkillBridge</span>
+        </a>
+        <nav class="sidebar__nav">
+            <a href="dashboard.html"  class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-gauge-high"></i></span><span class="sidebar__text">Dashboard</span></a>
+            <a href="posts.html"      class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-pen-to-square"></i></span><span class="sidebar__text">My Postings</span></a>
+            <a href="applicants.html" class="sidebar__link active"><span class="sidebar__icon"><i class="fa-solid fa-users"></i></span><span class="sidebar__text">Applicants</span></a>
+            <span class="sidebar__nav-section">Account</span>
+            <a href="profile.html"    class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-building"></i></span><span class="sidebar__text">Company Profile</span></a>
+            <a href="notifications.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-bell"></i></span><span class="sidebar__text">Notifications</span><span class="sidebar__badge" id="notif-badge" style="display:none;"></span></a>
+        </nav>
+        <div class="sidebar__footer">
+            <div class="sidebar__user">
+                <div class="sidebar__avatar" id="user-avatar">?</div>
+                <div class="sidebar__user-info">
+                    <div class="sidebar__user-name" id="user-name">Loading…</div>
+                    <div class="sidebar__user-role">Company / HR</div>
+                </div>
+            </div>
+            <button class="btn btn--ghost btn--full" id="btn-logout" style="margin-top:var(--space-2); justify-content:flex-start; color:var(--color-danger); font-size:var(--font-size-xs);"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+        </div>
+    </aside>
+
+    <div class="app-main">
+        <header class="app-header">
+            <div class="header__left">
+                <button class="header__menu-btn" id="menu-btn"><i class="fa-solid fa-bars"></i></button>
+                <span class="header__page-title">Applicants</span>
+            </div>
+            <div class="header__right">
+                <button class="header__notif-btn" onclick="location.href='notifications.html'"><i class="fa-solid fa-bell"></i></button>
+                <button class="header__avatar-btn" onclick="location.href='profile.html'">
+                    <div class="header__avatar avatar avatar--md" id="header-avatar">?</div>
+                </button>
+            </div>
+        </header>
+
+        <main class="page-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Applicants</h1>
+                    <p class="page-subtitle" id="apps-subtitle">Select a posting to review applicants.</p>
+                </div>
+            </div>
+
+            <!-- Post selector -->
+            <div class="post-selector">
+                <label for="post-select" style="font-size:var(--font-size-sm); font-weight:var(--font-weight-semibold); white-space:nowrap;">Filter by posting:</label>
+                <select id="post-select" class="form-control" style="max-width:360px;">
+                    <option value="">— All my postings —</option>
+                </select>
+
+                <div style="display:flex; gap:var(--space-2); margin-left:auto;">
+                    <button class="filter-tab active" data-status="all">All</button>
+                    <button class="filter-tab" data-status="pending"><i class="fa-regular fa-clock"></i> Pending</button>
+                    <button class="filter-tab" data-status="accepted"><i class="fa-solid fa-check"></i> Accepted</button>
+                    <button class="filter-tab" data-status="rejected"><i class="fa-solid fa-xmark"></i> Rejected</button>
+                </div>
+            </div>
+
+            <!-- Skeleton -->
+            <div id="apps-skeleton">
+                <div class="skeleton" style="height:130px; border-radius:var(--radius-lg); margin-bottom:var(--space-4);"></div>
+                <div class="skeleton" style="height:130px; border-radius:var(--radius-lg);"></div>
+            </div>
+
+            <!-- Applications list -->
+            <div class="apps-list" id="apps-container" style="display:none;"></div>
+        </main>
+    </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/utils.js"></script>
+<script>
+let currentUser   = null;
+let myPosts       = [];
+let allApps       = [];
+let activeFilter  = 'all';
+let selectedPostId = '';
+
+(async () => {
+    currentUser = await auth.requireRole('company');
+    if (!currentUser) return;
+
+    const init = utils.initials(currentUser.full_name);
+    document.getElementById('user-avatar').textContent   = init;
+    document.getElementById('user-name').textContent     = currentUser.full_name;
+    document.getElementById('header-avatar').textContent = init;
+
+    // notif count
+    try {
+        const n = await api.get('/notifications');
+        if (n.unread > 0) {
+            document.getElementById('notif-badge').style.display = '';
+            document.getElementById('notif-badge').textContent   = n.unread;
+        }
+    } catch {}
+
+    // Load posts
+    try {
+        myPosts = await api.get('/posts/my');
+        const sel = document.getElementById('post-select');
+        sel.innerHTML = `<option value="">— All my postings —</option>` +
+            myPosts.map(p => `<option value="${p.id}">${utils.escapeHtml(p.title)} (${p.applications_count})</option>`).join('');
+
+        // Auto-select from URL param
+        const urlPostId = new URLSearchParams(window.location.search).get('post_id');
+        if (urlPostId) {
+            sel.value      = urlPostId;
+            selectedPostId = urlPostId;
+        }
+    } catch {}
+
+    loadApps();
+})();
+
+document.getElementById('menu-btn').addEventListener('click', () =>
+    document.getElementById('sidebar').classList.toggle('open'));
+document.getElementById('btn-logout').addEventListener('click', async () =>
+    await auth.logout());
+
+document.getElementById('post-select').addEventListener('change', e => {
+    selectedPostId = e.target.value;
+    loadApps();
+});
+
+document.querySelectorAll('.filter-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.status;
+        renderApps();
+    });
+});
+
+async function loadApps() {
+    document.getElementById('apps-skeleton').style.display  = '';
+    document.getElementById('apps-container').style.display = 'none';
+    allApps = [];
+
+    const postsToLoad = selectedPostId
+        ? myPosts.filter(p => String(p.id) === String(selectedPostId))
+        : myPosts;
+
+    for (const post of postsToLoad) {
+        try {
+            const apps = await api.get(`/applications/post/${post.id}`);
+            allApps = [...allApps, ...apps.map(a => ({ ...a, post_id: post.id, post_title: post.title }))];
+        } catch {}
+    }
+
+    allApps.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    const label = selectedPostId
+        ? `${allApps.length} applicant${allApps.length !== 1 ? 's' : ''} for selected posting`
+        : `${allApps.length} total applicant${allApps.length !== 1 ? 's' : ''} across all postings`;
+    document.getElementById('apps-subtitle').textContent = label;
+
+    document.getElementById('apps-skeleton').style.display  = 'none';
+    document.getElementById('apps-container').style.display = '';
+    renderApps();
+}
+
+function renderApps() {
+    const container = document.getElementById('apps-container');
+    const filtered  = activeFilter === 'all'
+        ? allApps
+        : allApps.filter(a => a.status === activeFilter);
+
+    if (!filtered.length) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state__icon"><i class="fa-solid fa-users"></i></div>
+                <div class="empty-state__title">${allApps.length === 0 ? 'No applicants yet' : 'No ' + activeFilter + ' applicants'}</div>
+                <div class="empty-state__text">
+                    ${allApps.length === 0
+                        ? 'Once students apply to your postings, they will appear here.'
+                        : 'Try a different filter.'}
+                </div>
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = filtered.map(app => {
+        const name     = utils.escapeHtml(app.student_name || 'Unknown Student');
+        const initials = name.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
+        const uni      = app.university ? ` · ${utils.escapeHtml(app.university)}` : '';
+
+        const actionBtns = app.status === 'pending'
+            ? `<button class="btn btn--primary btn--sm" onclick="decide(${app.id}, 'accepted')"><i class="fa-solid fa-check"></i> Accept</button>
+               <button class="btn btn--danger-outline btn--sm" onclick="decide(${app.id}, 'rejected')"><i class="fa-solid fa-xmark"></i> Reject</button>`
+            : `<span class="badge badge--${app.status}" style="padding:var(--space-2) var(--space-3);">${app.status.charAt(0).toUpperCase() + app.status.slice(1)}</span>`;
+
+        return `
+        <div class="applicant-card" id="app-card-${app.id}">
+            <div class="applicant-card__avatar">${initials}</div>
+            <div>
+                <div class="applicant-card__name">${name}</div>
+                <div class="applicant-card__meta">${utils.timeAgo(app.created_at)}${uni}</div>
+                <span class="applicant-card__post">${utils.escapeHtml(app.post_title)}</span>
+                ${app.cover_letter
+                    ? `<div class="applicant-card__cover"><i class="fa-regular fa-comment"></i> ${utils.escapeHtml(utils.truncate(app.cover_letter, 220))}</div>`
+                    : ''}
+            </div>
+            <div class="applicant-actions" id="app-actions-${app.id}">
+                ${actionBtns}
+                <span style="font-size:var(--font-size-xs); color:var(--color-text-muted); margin-top:var(--space-1);">
+                    Applied ${utils.timeAgo(app.created_at)}
+                </span>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+async function decide(appId, status) {
+    const btns = document.getElementById('app-actions-' + appId).querySelectorAll('button');
+    btns.forEach(b => b.disabled = true);
+    try {
+        await api.patch(`/applications/${appId}/status`, { status });
+        const app = allApps.find(a => a.id === appId);
+        if (app) app.status = status;
+        toast.success(status === 'accepted' ? 'Accepted! <i class="fa-solid fa-party-horn"></i>' : 'Rejected', 'The student has been notified.');
+        renderApps();
+    } catch (err) {
+        toast.error('Error', err.message || 'Failed to update status.');
+        btns.forEach(b => b.disabled = false);
+    }
+}
+</script>
+
+</body>
+</html>

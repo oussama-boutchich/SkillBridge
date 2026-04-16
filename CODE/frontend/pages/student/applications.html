@@ -1,0 +1,327 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SkillBridge — Track all your job applications in one place.">
+    <title>SkillBridge | My Applications</title>
+
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../assets/css/variables.css">
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/layout.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+
+    <style>
+        .status-filter-bar {
+            display:       flex;
+            gap:           var(--space-2);
+            margin-bottom: var(--space-5);
+            flex-wrap:     wrap;
+        }
+
+        .app-item {
+            background:    var(--color-surface);
+            border:        1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding:       var(--space-5);
+            display:       flex;
+            align-items:   center;
+            gap:           var(--space-4);
+            transition:    box-shadow var(--transition-fast), border-color var(--transition-fast);
+            margin-bottom: var(--space-3);
+        }
+
+        .app-item:hover {
+            box-shadow:   var(--shadow-md);
+            border-color: var(--color-primary-border);
+        }
+
+        .app-item__icon {
+            width:         48px;
+            height:        48px;
+            flex-shrink:   0;
+            border-radius: var(--radius-md);
+            background:    var(--color-primary-surface);
+            display:       flex;
+            align-items:   center;
+            justify-content: center;
+            font-size:     1.3rem;
+            font-weight:   var(--font-weight-bold);
+            color:         var(--color-primary);
+        }
+
+        .app-item__body { flex: 1; min-width: 0; }
+
+        .app-item__title {
+            font-weight:   var(--font-weight-semibold);
+            font-size:     var(--font-size-md);
+            color:         var(--color-text-primary);
+            margin-bottom: 2px;
+            white-space:   nowrap;
+            overflow:      hidden;
+            text-overflow: ellipsis;
+        }
+
+        .app-item__meta {
+            font-size: var(--font-size-sm);
+            color:     var(--color-text-muted);
+        }
+
+        .app-item__right {
+            display:        flex;
+            flex-direction: column;
+            align-items:    flex-end;
+            gap:            var(--space-2);
+            flex-shrink:    0;
+        }
+
+        .app-item__date {
+            font-size: var(--font-size-xs);
+            color:     var(--color-text-muted);
+        }
+
+        /* Stats summary row */
+        .app-stats-row {
+            display:  grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap:      var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+
+        .app-stat-mini {
+            background:    var(--color-surface);
+            border:        1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding:       var(--space-4);
+            text-align:    center;
+        }
+
+        .app-stat-mini__value {
+            font-size:   var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            color:       var(--color-text-primary);
+        }
+
+        .app-stat-mini__label {
+            font-size:  var(--font-size-xs);
+            color:      var(--color-text-muted);
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 640px) {
+            .app-stats-row    { grid-template-columns: repeat(2, 1fr); }
+            .app-item         { flex-wrap: wrap; }
+            .app-item__right  { flex-direction: row; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <a href="dashboard.html" class="sidebar__brand">
+            <div class="sidebar__brand-icon">SB</div>
+            <span class="sidebar__brand-text">SkillBridge</span>
+        </a>
+        <nav class="sidebar__nav">
+            <a href="dashboard.html"    class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-gauge-high"></i></span><span class="sidebar__text">Dashboard</span></a>
+            <a href="browse-jobs.html"  class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-magnifying-glass"></i></span><span class="sidebar__text">Browse Opportunities</span></a>
+            <a href="applications.html" class="sidebar__link active"><span class="sidebar__icon"><i class="fa-solid fa-file-lines"></i></span><span class="sidebar__text">My Applications</span></a>
+            <a href="certificates.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-trophy"></i></span><span class="sidebar__text">Certificates</span></a>
+            <span class="sidebar__nav-section">Account</span>
+            <a href="profile.html"       class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-circle-user"></i></span><span class="sidebar__text">My Profile</span></a>
+            <a href="notifications.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-bell"></i></span><span class="sidebar__text">Notifications</span><span class="sidebar__badge" id="notif-badge" style="display:none;"></span></a>
+        </nav>
+        <div class="sidebar__footer">
+            <div class="sidebar__user">
+                <div class="sidebar__avatar" id="user-avatar">?</div>
+                <div class="sidebar__user-info">
+                    <div class="sidebar__user-name" id="user-name">Loading…</div>
+                    <div class="sidebar__user-role">Student</div>
+                </div>
+            </div>
+            <button class="btn btn--ghost btn--full" id="btn-logout" style="margin-top:var(--space-2); justify-content:flex-start; color:var(--color-danger); font-size:var(--font-size-xs);"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="app-main">
+        <header class="app-header">
+            <div class="header__left">
+                <button class="header__menu-btn" id="menu-btn"><i class="fa-solid fa-bars"></i></button>
+                <span class="header__page-title">My Applications</span>
+            </div>
+            <div class="header__right">
+                <button class="header__notif-btn" onclick="location.href='notifications.html'"><i class="fa-solid fa-bell"></i>
+                    <span class="header__notif-count" id="header-notif-count" style="display:none;"></span>
+                </button>
+                <button class="header__avatar-btn" onclick="location.href='profile.html'">
+                    <div class="header__avatar avatar avatar--md" id="header-avatar">?</div>
+                </button>
+            </div>
+        </header>
+
+        <main class="page-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">My Applications</h1>
+                    <p class="page-subtitle">Track the status of all your applications.</p>
+                </div>
+                <a href="browse-jobs.html" class="btn btn--primary"><i class="fa-solid fa-magnifying-glass"></i> Find More Opportunities</a>
+            </div>
+
+            <!-- Stats Summary -->
+            <div class="app-stats-row" id="stats-row">
+                <div class="app-stat-mini"><div class="app-stat-mini__value" id="s-total">—</div><div class="app-stat-mini__label">Total</div></div>
+                <div class="app-stat-mini"><div class="app-stat-mini__value" id="s-pending" style="color:var(--color-warning);">—</div><div class="app-stat-mini__label">Pending</div></div>
+                <div class="app-stat-mini"><div class="app-stat-mini__value" id="s-accepted" style="color:var(--color-success);">—</div><div class="app-stat-mini__label">Accepted</div></div>
+                <div class="app-stat-mini"><div class="app-stat-mini__value" id="s-rejected" style="color:var(--color-danger);">—</div><div class="app-stat-mini__label">Rejected</div></div>
+            </div>
+
+            <!-- Status Filter -->
+            <div class="status-filter-bar">
+                <button class="filter-tab active" data-filter="all">All</button>
+                <button class="filter-tab" data-filter="pending"><i class="fa-regular fa-clock"></i> Pending</button>
+                <button class="filter-tab" data-filter="accepted"><i class="fa-solid fa-check"></i> Accepted</button>
+                <button class="filter-tab" data-filter="rejected"><i class="fa-solid fa-xmark"></i> Rejected</button>
+            </div>
+
+            <!-- Applications List -->
+            <div id="apps-container">
+                <div class="skeleton" style="height:88px; border-radius:var(--radius-lg); margin-bottom:var(--space-3);"></div>
+                <div class="skeleton" style="height:88px; border-radius:var(--radius-lg); margin-bottom:var(--space-3);"></div>
+                <div class="skeleton" style="height:88px; border-radius:var(--radius-lg);"></div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/utils.js"></script>
+<script>
+let currentUser = null;
+let allApps     = [];
+let activeFilter = 'all';
+
+(async () => {
+    currentUser = await auth.requireRole('student');
+    if (!currentUser) return;
+
+    const init = utils.initials(currentUser.full_name);
+    document.getElementById('user-avatar').textContent   = init;
+    document.getElementById('user-name').textContent     = currentUser.full_name;
+    document.getElementById('header-avatar').textContent = init;
+
+    // Notif count
+    try {
+        const n = await api.get('/notifications');
+        if (n.unread > 0) {
+            document.getElementById('notif-badge').style.display         = '';
+            document.getElementById('notif-badge').textContent           = n.unread;
+            document.getElementById('header-notif-count').style.display  = '';
+            document.getElementById('header-notif-count').textContent    = n.unread;
+        }
+    } catch {}
+
+    loadApps();
+})();
+
+document.getElementById('menu-btn').addEventListener('click', () =>
+    document.getElementById('sidebar').classList.toggle('open'));
+document.getElementById('btn-logout').addEventListener('click', async () =>
+    await auth.logout());
+
+// Filter tabs
+document.querySelectorAll('.filter-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        renderApps();
+    });
+});
+
+async function loadApps() {
+    try {
+        allApps = await api.get('/applications/my');
+        updateStats();
+        renderApps();
+    } catch (err) {
+        document.getElementById('apps-container').innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state__icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div class="empty-state__title">Failed to load applications</div>
+                <div class="empty-state__text">${utils.escapeHtml(err.message)}</div>
+                <button class="btn btn--outline btn--sm" onclick="loadApps()">Retry</button>
+            </div>`;
+    }
+}
+
+function updateStats() {
+    document.getElementById('s-total').textContent    = allApps.length;
+    document.getElementById('s-pending').textContent  = allApps.filter(a => a.status === 'pending').length;
+    document.getElementById('s-accepted').textContent = allApps.filter(a => a.status === 'accepted').length;
+    document.getElementById('s-rejected').textContent = allApps.filter(a => a.status === 'rejected').length;
+}
+
+function renderApps() {
+    const container = document.getElementById('apps-container');
+    const filtered  = activeFilter === 'all'
+        ? allApps
+        : allApps.filter(a => a.status === activeFilter);
+
+    if (!filtered.length) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state__icon"><i class="fa-solid fa-file-lines"></i></div>
+                <div class="empty-state__title">${activeFilter === 'all' ? 'No applications yet' : `No ${activeFilter} applications`}</div>
+                <div class="empty-state__text">
+                    ${activeFilter === 'all'
+                        ? 'Start exploring and apply to your first opportunity!'
+                        : `You have no ${activeFilter} applications to show.`}
+                </div>
+                ${activeFilter === 'all' ? `<a href="browse-jobs.html" class="btn btn--primary btn--sm">Browse Opportunities</a>` : ''}
+            </div>`;
+        return;
+    }
+
+    const typeIcon = { internship: '<i class="fa-solid fa-clipboard-list"></i>', job: '<i class="fa-solid fa-briefcase"></i>', challenge: '<i class="fa-solid fa-trophy"></i>' };
+
+    container.innerHTML = filtered.map(app => {
+        const icon      = typeIcon[app.post_type] || '<i class="fa-solid fa-file-lines"></i>';
+        const company   = utils.escapeHtml(app.company_name || 'Unknown Company');
+        const initials  = company.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+
+        return `
+        <div class="app-item">
+            <div class="app-item__icon">${initials.slice(0,2)}</div>
+            <div class="app-item__body">
+                <div class="app-item__title">${utils.escapeHtml(app.post_title)}</div>
+                <div class="app-item__meta">
+                    ${company}
+                    ${app.cover_letter
+                        ? ` · <span title="${utils.escapeHtml(app.cover_letter)}" style="cursor:help; border-bottom:1px dashed var(--color-text-muted);">Has cover letter</span>`
+                        : ''}
+                </div>
+            </div>
+            <div class="app-item__right">
+                <span class="badge badge--${app.status}">${app.status.charAt(0).toUpperCase() + app.status.slice(1)}</span>
+                <span class="app-item__date">Applied ${utils.timeAgo(app.created_at)}</span>
+                <a href="job-detail.html?id=${app.post_id}" class="btn btn--ghost btn--sm">View Post</a>
+            </div>
+        </div>`;
+    }).join('');
+}
+</script>
+
+</body>
+</html>

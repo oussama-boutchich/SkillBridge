@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SkillBridge Student Dashboard — Your career hub.">
+    <title>SkillBridge | Student Dashboard</title>
+
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../assets/css/variables.css">
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/layout.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+</head>
+<body>
+
+<div class="app-shell">
+
+    <!-- ════════ SIDEBAR ════════ -->
+    <aside class="sidebar" id="sidebar">
+        <a href="dashboard.html" class="sidebar__brand">
+            <div class="sidebar__brand-icon">SB</div>
+            <span class="sidebar__brand-text">SkillBridge</span>
+        </a>
+
+        <nav class="sidebar__nav">
+            <a href="dashboard.html" class="sidebar__link active" id="nav-dashboard">
+                <span class="sidebar__icon"><i class="fa-solid fa-gauge-high"></i></span>
+                <span class="sidebar__text">Dashboard</span>
+            </a>
+            <a href="browse-jobs.html" class="sidebar__link" id="nav-browse">
+                <span class="sidebar__icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <span class="sidebar__text">Browse Opportunities</span>
+            </a>
+            <a href="applications.html" class="sidebar__link" id="nav-applications">
+                <span class="sidebar__icon"><i class="fa-solid fa-file-lines"></i></span>
+                <span class="sidebar__text">My Applications</span>
+            </a>
+            <a href="certificates.html" class="sidebar__link" id="nav-certs">
+                <span class="sidebar__icon"><i class="fa-solid fa-trophy"></i></span>
+                <span class="sidebar__text">Certificates</span>
+            </a>
+
+            <span class="sidebar__nav-section">Account</span>
+            <a href="profile.html" class="sidebar__link" id="nav-profile">
+                <span class="sidebar__icon"><i class="fa-solid fa-circle-user"></i></span>
+                <span class="sidebar__text">My Profile</span>
+            </a>
+            <a href="notifications.html" class="sidebar__link" id="nav-notif">
+                <span class="sidebar__icon"><i class="fa-solid fa-bell"></i></span>
+                <span class="sidebar__text">Notifications</span>
+                <span class="sidebar__badge" id="notif-badge" style="display:none;">0</span>
+            </a>
+        </nav>
+
+        <div class="sidebar__footer">
+            <div class="sidebar__user" id="user-section">
+                <div class="sidebar__avatar" id="user-avatar">?</div>
+                <div class="sidebar__user-info">
+                    <div class="sidebar__user-name" id="user-name">Loading…</div>
+                    <div class="sidebar__user-role">Student</div>
+                </div>
+            </div>
+            <button class="btn btn--ghost btn--full" id="btn-logout" style="margin-top:var(--space-2); justify-content:flex-start; color:var(--color-danger); font-size:var(--font-size-xs);">
+                <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+            </button>
+        </div>
+    </aside>
+
+    <!-- ════════ MAIN ════════ -->
+    <div class="app-main">
+
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header__left">
+                <button class="header__menu-btn" id="menu-btn" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button>
+                <span class="header__page-title">Dashboard</span>
+            </div>
+            <div class="header__right">
+                <div class="header__search">
+                    <span><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <input type="search" id="quick-search" placeholder="Search opportunities…">
+                </div>
+                <button class="header__notif-btn" onclick="location.href='notifications.html'" aria-label="Notifications">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="header__notif-count" id="header-notif-count" style="display:none;"></span>
+                </button>
+                <button class="header__avatar-btn" onclick="location.href='profile.html'" id="header-avatar-btn">
+                    <div class="header__avatar avatar avatar--md" id="header-avatar">?</div>
+                </button>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="page-content">
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title" id="greeting">Good morning! Hi,</h1>
+                    <p class="page-subtitle">Here's what's happening with your career journey today.</p>
+                </div>
+                <a href="browse-jobs.html" class="btn btn--primary">
+                    <i class="fa-solid fa-magnifying-glass"></i> Browse Jobs
+                </a>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card__icon stat-card__icon--blue"><i class="fa-solid fa-file-lines"></i></div>
+                    <div class="stat-card__body">
+                        <div class="stat-card__value" id="stat-apps">—</div>
+                        <div class="stat-card__label">Applications</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card__icon stat-card__icon--orange"><i class="fa-regular fa-clock"></i></div>
+                    <div class="stat-card__body">
+                        <div class="stat-card__value" id="stat-pending">—</div>
+                        <div class="stat-card__label">Pending</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card__icon stat-card__icon--green"><i class="fa-solid fa-check"></i></div>
+                    <div class="stat-card__body">
+                        <div class="stat-card__value" id="stat-accepted">—</div>
+                        <div class="stat-card__label">Accepted</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card__icon stat-card__icon--blue"><i class="fa-solid fa-trophy"></i></div>
+                    <div class="stat-card__body">
+                        <div class="stat-card__value" id="stat-certs">—</div>
+                        <div class="stat-card__label">Certificates</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+
+                <!-- Recent Applications -->
+                <div>
+                    <div class="card">
+                        <div class="card__header">
+                            <div>
+                                <div class="card__title">Recent Applications</div>
+                                <div class="card__subtitle">Your latest job applications</div>
+                            </div>
+                            <a href="applications.html" class="btn btn--ghost btn--sm">View All</a>
+                        </div>
+                        <div id="applications-list">
+                            <!-- Skeleton -->
+                            <div style="display:flex; flex-direction:column; gap:var(--space-3);">
+                                <div class="skeleton" style="height:68px; border-radius:var(--radius-md);"></div>
+                                <div class="skeleton" style="height:68px; border-radius:var(--radius-md);"></div>
+                                <div class="skeleton" style="height:68px; border-radius:var(--radius-md);"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Opportunities Spotlight -->
+                    <div class="card" style="margin-top:var(--space-6);">
+                        <div class="card__header">
+                            <div>
+                                <div class="card__title">Latest Opportunities</div>
+                                <div class="card__subtitle">Fresh posts from companies</div>
+                            </div>
+                            <a href="browse-jobs.html" class="btn btn--ghost btn--sm">Browse All</a>
+                        </div>
+                        <div id="posts-list">
+                            <div style="display:flex; flex-direction:column; gap:var(--space-3);">
+                                <div class="skeleton" style="height:80px; border-radius:var(--radius-md);"></div>
+                                <div class="skeleton" style="height:80px; border-radius:var(--radius-md);"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar -->
+                <div style="display:flex; flex-direction:column; gap:var(--space-6);">
+
+                    <!-- Profile Completion -->
+                    <div class="card">
+                        <div class="card__title" style="margin-bottom:var(--space-4);">Profile Strength</div>
+                        <div id="profile-completeness">
+                            <div class="skeleton" style="height:24px; width:100%; margin-bottom:var(--space-2);"></div>
+                            <div class="skeleton" style="height:12px; width:60%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Certificates -->
+                    <div class="card">
+                        <div class="card__header" style="margin-bottom:var(--space-4);">
+                            <div class="card__title">Certificates</div>
+                            <a href="certificates.html" class="btn btn--ghost btn--sm">Manage</a>
+                        </div>
+                        <div id="certs-list">
+                            <div class="skeleton" style="height:56px; border-radius:var(--radius-md);"></div>
+                        </div>
+                    </div>
+
+                    <!-- Latest Notifications -->
+                    <div class="card">
+                        <div class="card__header" style="margin-bottom:var(--space-4);">
+                            <div class="card__title">Notifications</div>
+                            <a href="notifications.html" class="btn btn--ghost btn--sm">All</a>
+                        </div>
+                        <div id="notif-list">
+                            <div class="skeleton" style="height:56px; border-radius:var(--radius-md);"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /dashboard-grid -->
+        </main>
+    </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/utils.js"></script>
+<script>
+// ── Auth guard ────────────────────────────────────────────────────────────
+let currentUser = null;
+
+(async () => {
+    currentUser = await auth.requireRole('student');
+    if (!currentUser) return;
+    init();
+})();
+
+// ── Sidebar mobile toggle ─────────────────────────────────────────────────
+document.getElementById('menu-btn').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open');
+});
+
+// ── Logout ────────────────────────────────────────────────────────────────
+document.getElementById('btn-logout').addEventListener('click', async () => {
+    await auth.logout();
+});
+
+// ── Quick search ─────────────────────────────────────────────────────────
+document.getElementById('quick-search').addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+        const q = e.target.value.trim();
+        if (q) location.href = `browse-jobs.html?search=${encodeURIComponent(q)}`;
+    }
+});
+
+// ── Greeting ──────────────────────────────────────────────────────────────
+function setGreeting(name) {
+    const hour = new Date().getHours();
+    let prefix = 'Good morning';
+    if (hour >= 12 && hour < 17) prefix = 'Good afternoon';
+    else if (hour >= 17)         prefix = 'Good evening';
+    document.getElementById('greeting').textContent = `${prefix}, ${name}!`;
+}
+
+// ── Update user UI ────────────────────────────────────────────────────────
+function renderUserUI(user) {
+    const initials = utils.initials(user.full_name);
+    document.getElementById('user-name').textContent    = user.full_name;
+    document.getElementById('user-avatar').textContent  = initials;
+    document.getElementById('header-avatar').textContent = initials;
+    setGreeting(user.full_name.split(' ')[0]);
+}
+
+// ── Status badge helper ───────────────────────────────────────────────────
+function statusBadge(status) {
+    return `<span class="badge badge--${status}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>`;
+}
+
+// ── Type badge helper ─────────────────────────────────────────────────────
+function typeBadge(type) {
+    return `<span class="badge badge--${type}">${type.charAt(0).toUpperCase() + type.slice(1)}</span>`;
+}
+
+// ── Render applications ───────────────────────────────────────────────────
+function renderApplications(apps) {
+    const el = document.getElementById('applications-list');
+    if (!apps || apps.length === 0) {
+        el.innerHTML = `
+            <div class="empty-state" style="padding:var(--space-8) 0;">
+                <div class="empty-state__icon"><i class="fa-solid fa-file-lines"></i></div>
+                <div class="empty-state__title">No applications yet</div>
+                <div class="empty-state__text">Start exploring opportunities and apply!</div>
+                <a href="browse-jobs.html" class="btn btn--primary btn--sm">Browse Now</a>
+            </div>`;
+        return;
+    }
+
+    const recent = apps.slice(0, 5);
+    el.innerHTML = recent.map(app => `
+        <div style="display:flex; align-items:center; gap:var(--space-4); padding:var(--space-3) 0; border-bottom:1px solid var(--color-border);">
+            <div style="flex:1; min-width:0;">
+                <div style="font-weight:var(--font-weight-semibold); font-size:var(--font-size-sm); color:var(--color-text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    ${utils.escapeHtml(app.post_title)}
+                </div>
+                <div style="font-size:var(--font-size-xs); color:var(--color-text-muted); margin-top:2px;">
+                    ${utils.escapeHtml(app.company_name || '—')} · ${utils.timeAgo(app.created_at)}
+                </div>
+            </div>
+            ${statusBadge(app.status)}
+        </div>
+    `).join('');
+
+    // Update stats
+    document.getElementById('stat-apps').textContent     = apps.length;
+    document.getElementById('stat-pending').textContent  = apps.filter(a => a.status === 'pending').length;
+    document.getElementById('stat-accepted').textContent = apps.filter(a => a.status === 'accepted').length;
+}
+
+// ── Render posts ──────────────────────────────────────────────────────────
+function renderPosts(data) {
+    const el = document.getElementById('posts-list');
+    const posts = data.items || [];
+    if (!posts.length) {
+        el.innerHTML = '<p style="color:var(--color-text-muted); font-size:var(--font-size-sm); text-align:center; padding:var(--space-4);">No active opportunities.</p>';
+        return;
+    }
+
+    el.innerHTML = posts.slice(0, 4).map(p => `
+        <a href="job-detail.html?id=${p.id}" style="display:flex; align-items:flex-start; gap:var(--space-3); padding:var(--space-3) 0; border-bottom:1px solid var(--color-border); text-decoration:none;">
+            <div style="flex:1; min-width:0;">
+                <div style="font-weight:var(--font-weight-semibold); font-size:var(--font-size-sm); color:var(--color-text-primary);">
+                    ${utils.escapeHtml(p.title)}
+                </div>
+                <div style="font-size:var(--font-size-xs); color:var(--color-text-muted); margin-top:2px;">
+                    ${utils.escapeHtml(p.company_name || '—')} · ${p.is_remote ? '<i class="fa-solid fa-globe"></i> Remote' : '<i class="fa-solid fa-location-dot"></i> ' + utils.escapeHtml(p.location || 'On-site')}
+                </div>
+            </div>
+            ${typeBadge(p.type)}
+        </a>
+    `).join('');
+}
+
+// ── Render certificates ───────────────────────────────────────────────────
+function renderCerts(certs) {
+    const el = document.getElementById('certs-list');
+    document.getElementById('stat-certs').textContent = certs.length;
+
+    if (!certs.length) {
+        el.innerHTML = `
+            <div style="text-align:center; padding:var(--space-4);">
+                <p style="font-size:var(--font-size-sm); color:var(--color-text-muted); margin-bottom:var(--space-3);">No certificates yet.</p>
+                <a href="certificates.html" class="btn btn--outline btn--sm">+ Add Certificate</a>
+            </div>`;
+        return;
+    }
+
+    el.innerHTML = certs.slice(0, 3).map(c => `
+        <div style="display:flex; align-items:center; gap:var(--space-3); padding:var(--space-2) 0; border-bottom:1px solid var(--color-border);">
+            <span style="font-size:1.4rem; flex-shrink:0;"><i class="fa-solid fa-trophy"></i></span>
+            <div style="flex:1; min-width:0;">
+                <div style="font-weight:var(--font-weight-medium); font-size:var(--font-size-sm); color:var(--color-text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    ${utils.escapeHtml(c.title)}
+                </div>
+                <div style="font-size:var(--font-size-xs); color:var(--color-text-muted);">
+                    ${utils.escapeHtml(c.issuer)}
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ── Render notifications ──────────────────────────────────────────────────
+function renderNotifs(data) {
+    const el    = document.getElementById('notif-list');
+    const notifs = data.items || [];
+    const unread = data.unread || 0;
+
+    // Update badge
+    if (unread > 0) {
+        document.getElementById('notif-badge').style.display       = '';
+        document.getElementById('notif-badge').textContent         = unread;
+        document.getElementById('header-notif-count').style.display = '';
+        document.getElementById('header-notif-count').textContent  = unread;
+    }
+
+    if (!notifs.length) {
+        el.innerHTML = '<p style="font-size:var(--font-size-sm); color:var(--color-text-muted); text-align:center; padding:var(--space-3);">No notifications.</p>';
+        return;
+    }
+
+    el.innerHTML = notifs.slice(0, 3).map(n => `
+        <div style="display:flex; align-items:flex-start; gap:var(--space-2); padding:var(--space-2) 0; border-bottom:1px solid var(--color-border); ${!n.is_read ? 'background:var(--color-primary-surface); margin:0 -var(--space-1); padding:var(--space-2) var(--space-1); border-radius:var(--radius-sm);' : ''}">
+            <div style="flex:1;">
+                <div style="font-weight:var(--font-weight-medium); font-size:var(--font-size-xs); color:var(--color-text-primary);">
+                    ${utils.escapeHtml(n.title)}
+                    ${!n.is_read ? '<span style="display:inline-block; width:6px; height:6px; background:var(--color-primary); border-radius:50%; margin-left:4px; vertical-align:middle;"></span>' : ''}
+                </div>
+                <div style="font-size:var(--font-size-xs); color:var(--color-text-muted); margin-top:2px;">
+                    ${utils.timeAgo(n.created_at)}
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ── Profile completeness ──────────────────────────────────────────────────
+function renderProfileStrength(profile) {
+    const fields  = ['university','field_of_study','bio','skills','linkedin_url'];
+    const filled  = fields.filter(f => profile[f] && String(profile[f]).trim()).length;
+    const pct     = Math.round((filled / fields.length) * 100);
+    const color   = pct >= 80 ? 'var(--color-success)' : pct >= 40 ? 'var(--color-warning)' : 'var(--color-danger)';
+    const label   = pct >= 80 ? 'Strong' : pct >= 40 ? 'Moderate' : 'Needs Work';
+
+    document.getElementById('profile-completeness').innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-2);">
+            <span style="font-size:var(--font-size-sm); color:var(--color-text-secondary);">${label}</span>
+            <span style="font-size:var(--font-size-sm); font-weight:var(--font-weight-semibold); color:${color};">${pct}%</span>
+        </div>
+        <div style="background:var(--color-border); border-radius:var(--radius-full); height:8px; overflow:hidden;">
+            <div style="height:100%; width:${pct}%; background:${color}; border-radius:var(--radius-full); transition:width 0.8s ease;"></div>
+        </div>
+        <p style="font-size:var(--font-size-xs); color:var(--color-text-muted); margin-top:var(--space-2);">
+            ${filled}/${fields.length} profile sections complete.
+            ${pct < 100 ? '<a href="profile.html">Complete your profile →</a>' : ''}
+        </p>
+    `;
+}
+
+// ── Main init ──────────────────────────────────────────────────────────────
+async function init() {
+    renderUserUI(currentUser);
+
+    const userId = currentUser.user_id;
+
+    // Parallel data fetch
+    const [appsRes, postsRes, profileRes, certsRes, notifsRes] = await Promise.allSettled([
+        api.get('/applications/my'),
+        api.get('/posts', { page: 1 }),
+        api.get(`/profiles/student/${userId}`),
+        api.get('/certificates'),
+        api.get('/notifications', { page: 1 }),
+    ]);
+
+    if (appsRes.status === 'fulfilled') renderApplications(appsRes.value);
+    if (postsRes.status === 'fulfilled') renderPosts(postsRes.value);
+    if (profileRes.status === 'fulfilled') renderProfileStrength(profileRes.value);
+    if (certsRes.status === 'fulfilled') renderCerts(certsRes.value);
+    if (notifsRes.status === 'fulfilled') renderNotifs(notifsRes.value);
+}
+</script>
+
+</body>
+</html>

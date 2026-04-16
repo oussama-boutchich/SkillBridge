@@ -1,0 +1,293 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SkillBridge — Edit your company profile.">
+    <title>SkillBridge | Company Profile</title>
+
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../assets/css/variables.css">
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/layout.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+
+    <style>
+        .profile-layout { display: grid; grid-template-columns: 280px 1fr; gap: var(--space-6); align-items: start; }
+        .company-id-card {
+            background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+            padding: var(--space-6); text-align: center; position: sticky; top: calc(var(--header-height) + var(--space-5));
+        }
+        .company-logo-placeholder {
+            width: 80px; height: 80px; border-radius: var(--radius-lg); margin: 0 auto var(--space-4);
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold);
+        }
+        .form-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-6); margin-bottom: var(--space-5); }
+        .form-card__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-5); padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+        @media (max-width: 900px) { .profile-layout { grid-template-columns: 1fr; } .company-id-card { position: static; } }
+        @media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+</head>
+<body>
+
+<div class="app-shell">
+
+    <aside class="sidebar" id="sidebar">
+        <a href="dashboard.html" class="sidebar__brand">
+            <div class="sidebar__brand-icon">SB</div>
+            <span class="sidebar__brand-text">SkillBridge</span>
+        </a>
+        <nav class="sidebar__nav">
+            <a href="dashboard.html"  class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-gauge-high"></i></span><span class="sidebar__text">Dashboard</span></a>
+            <a href="posts.html"      class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-pen-to-square"></i></span><span class="sidebar__text">My Postings</span></a>
+            <a href="applicants.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-users"></i></span><span class="sidebar__text">Applicants</span></a>
+            <span class="sidebar__nav-section">Account</span>
+            <a href="profile.html"    class="sidebar__link active"><span class="sidebar__icon"><i class="fa-solid fa-building"></i></span><span class="sidebar__text">Company Profile</span></a>
+            <a href="notifications.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-bell"></i></span><span class="sidebar__text">Notifications</span></a>
+        </nav>
+        <div class="sidebar__footer">
+            <div class="sidebar__user">
+                <div class="sidebar__avatar" id="user-avatar">?</div>
+                <div class="sidebar__user-info">
+                    <div class="sidebar__user-name" id="user-name">Loading…</div>
+                    <div class="sidebar__user-role">Company / HR</div>
+                </div>
+            </div>
+            <button class="btn btn--ghost btn--full" id="btn-logout" style="margin-top:var(--space-2); justify-content:flex-start; color:var(--color-danger); font-size:var(--font-size-xs);"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+        </div>
+    </aside>
+
+    <div class="app-main">
+        <header class="app-header">
+            <div class="header__left">
+                <button class="header__menu-btn" id="menu-btn"><i class="fa-solid fa-bars"></i></button>
+                <span class="header__page-title">Company Profile</span>
+            </div>
+            <div class="header__right">
+                <button class="header__notif-btn" onclick="location.href='notifications.html'"><i class="fa-solid fa-bell"></i></button>
+                <button class="header__avatar-btn" onclick="location.href='profile.html'">
+                    <div class="header__avatar avatar avatar--md" id="header-avatar">?</div>
+                </button>
+            </div>
+        </header>
+
+        <main class="page-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Company Profile</h1>
+                    <p class="page-subtitle">Keep your profile updated to attract the best candidates.</p>
+                </div>
+            </div>
+
+            <div class="profile-layout">
+                <!-- Left -->
+                <div class="company-id-card" id="company-card">
+                    <div class="skeleton" style="width:80px;height:80px;border-radius:var(--radius-lg);margin:0 auto var(--space-4);"></div>
+                    <div class="skeleton" style="height:22px;width:70%;margin:0 auto var(--space-2);"></div>
+                    <div class="skeleton" style="height:16px;width:50%;margin:0 auto;"></div>
+                </div>
+
+                <!-- Right -->
+                <div>
+                    <div id="save-alert" class="alert" style="display:none;">
+                        <span class="alert__icon" id="save-icon"></span>
+                        <span class="alert__body" id="save-msg"></span>
+                    </div>
+
+                    <div class="form-card">
+                        <div class="form-card__header">
+                            <div style="font-size:var(--font-size-md); font-weight:var(--font-weight-semibold);"><i class="fa-solid fa-building"></i> Company Information</div>
+                        </div>
+                        <form id="profile-form" novalidate>
+                            <div class="form-group">
+                                <label for="f-name" class="form-label">Company Name <span class="required">*</span></label>
+                                <input type="text" id="f-name" class="form-control" placeholder="e.g. TechCorp Algeria" required>
+                                <span class="form-error" id="err-company_name" style="display:none;"></span>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="f-industry" class="form-label">Industry</label>
+                                    <input type="text" id="f-industry" class="form-control" placeholder="e.g. Software Development">
+                                </div>
+                                <div class="form-group">
+                                    <label for="f-size" class="form-label">Company Size</label>
+                                    <select id="f-size" class="form-control">
+                                        <option value="">— Select size —</option>
+                                        <option value="1-10">1–10 employees</option>
+                                        <option value="11-50">11–50 employees</option>
+                                        <option value="51-200">51–200 employees</option>
+                                        <option value="201-1000">201–1000 employees</option>
+                                        <option value="1000+">1000+ employees</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="f-location" class="form-label">Location</label>
+                                    <input type="text" id="f-location" class="form-control" placeholder="e.g. Algiers, Algeria">
+                                </div>
+                                <div class="form-group">
+                                    <label for="f-founded" class="form-label">Founded Year</label>
+                                    <input type="number" id="f-founded" class="form-control" placeholder="e.g. 2015" min="1900" max="2025">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="f-website" class="form-label">Website URL</label>
+                                <input type="url" id="f-website" class="form-control" placeholder="https://company.com">
+                                <span class="form-error" id="err-website" style="display:none;"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="f-desc" class="form-label">About the Company</label>
+                                <textarea id="f-desc" class="form-control" placeholder="Describe your company, mission, and culture…" style="min-height:110px;"></textarea>
+                            </div>
+                            <div style="display:flex; justify-content:flex-end; gap:var(--space-3); margin-top:var(--space-4);">
+                                <button type="button" id="btn-reset" class="btn btn--secondary">Reset</button>
+                                <button type="submit" id="btn-save" class="btn btn--primary"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Account info -->
+                    <div class="form-card">
+                        <div class="form-card__header">
+                            <div style="font-size:var(--font-size-md); font-weight:var(--font-weight-semibold);"><i class="fa-solid fa-gear"></i> Account Details</div>
+                        </div>
+                        <div style="font-size:var(--font-size-sm); display:flex; flex-direction:column; gap:var(--space-3);">
+                            <div style="display:flex; justify-content:space-between;">
+                                <span style="color:var(--color-text-muted);">Full Name</span>
+                                <span id="acc-name" style="font-weight:var(--font-weight-medium);">—</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between;">
+                                <span style="color:var(--color-text-muted);">Email</span>
+                                <span id="acc-email" style="font-weight:var(--font-weight-medium);">—</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between;">
+                                <span style="color:var(--color-text-muted);">Role</span>
+                                <span class="badge badge--job">Company / HR</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-card" style="border-color:var(--color-danger-bg);">
+                        <div class="form-card__header">
+                            <div style="font-size:var(--font-size-md); font-weight:var(--font-weight-semibold); color:var(--color-danger);"><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone</div>
+                        </div>
+                        <button class="btn btn--danger-outline" id="btn-signout">Sign Out</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/utils.js"></script>
+<script>
+let currentUser = null;
+let profileData = null;
+
+(async () => {
+    currentUser = await auth.requireRole('company');
+    if (!currentUser) return;
+
+    const init = utils.initials(currentUser.full_name);
+    document.getElementById('user-avatar').textContent   = init;
+    document.getElementById('user-name').textContent     = currentUser.full_name;
+    document.getElementById('header-avatar').textContent = init;
+    document.getElementById('acc-name').textContent      = currentUser.full_name;
+    document.getElementById('acc-email').textContent     = currentUser.email;
+
+    try {
+        profileData = await api.get(`/profiles/company/${currentUser.user_id}`);
+        fillForm(profileData);
+        renderCard(profileData);
+    } catch {}
+})();
+
+document.getElementById('menu-btn').addEventListener('click', () =>
+    document.getElementById('sidebar').classList.toggle('open'));
+document.getElementById('btn-logout').addEventListener('click',  async () => await auth.logout());
+document.getElementById('btn-signout').addEventListener('click', async () => await auth.logout());
+document.getElementById('btn-reset').addEventListener('click', () => { if (profileData) fillForm(profileData); });
+
+document.getElementById('profile-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn  = document.getElementById('btn-save');
+    const name = document.getElementById('f-name').value.trim();
+    const website = document.getElementById('f-website').value.trim();
+
+    utils.setError('err-company_name', '');
+    utils.setError('err-website', '');
+    document.getElementById('save-alert').style.display = 'none';
+
+    let valid = true;
+    if (!name)    { utils.setError('err-company_name', 'Company name is required.'); valid = false; }
+    if (website && !/^https?:\/\/.+/.test(website)) { utils.setError('err-website', 'Must be a valid URL.'); valid = false; }
+    if (!valid) return;
+
+    utils.setLoading(btn, true);
+
+    const payload = {
+        company_name:   name,
+        industry:       document.getElementById('f-industry').value.trim() || null,
+        company_size:   document.getElementById('f-size').value            || null,
+        location:       document.getElementById('f-location').value.trim() || null,
+        founded_year:   document.getElementById('f-founded').value         || null,
+        website:        website || null,
+        description:    document.getElementById('f-desc').value.trim()     || null,
+    };
+
+    try {
+        await api.put('/profiles/company', payload);
+        profileData = { ...profileData, ...payload };
+        renderCard(profileData);
+        const alert = document.getElementById('save-alert');
+        alert.className = 'alert alert--success';
+        alert.style.display = 'flex';
+        document.getElementById('save-icon').textContent = '<i class="fa-solid fa-check"></i>';
+        document.getElementById('save-msg').textContent  = 'Company profile updated successfully!';
+        toast.success('Saved!', 'Profile has been updated.');
+        setTimeout(() => { alert.style.display = 'none'; }, 3000);
+    } catch (err) {
+        const alert = document.getElementById('save-alert');
+        alert.className = 'alert alert--error';
+        alert.style.display = 'flex';
+        document.getElementById('save-icon').textContent = '<i class="fa-solid fa-triangle-exclamation"></i>';
+        document.getElementById('save-msg').textContent  = err.message || 'Save failed.';
+    } finally {
+        utils.setLoading(btn, false);
+    }
+});
+
+function fillForm(p) {
+    document.getElementById('f-name').value     = p.company_name  || '';
+    document.getElementById('f-industry').value = p.industry      || '';
+    document.getElementById('f-size').value     = p.company_size  || '';
+    document.getElementById('f-location').value = p.location      || '';
+    document.getElementById('f-founded').value  = p.founded_year  || '';
+    document.getElementById('f-website').value  = p.website       || '';
+    document.getElementById('f-desc').value     = p.description   || '';
+}
+
+function renderCard(p) {
+    const name    = utils.escapeHtml(p.company_name || currentUser.full_name);
+    const letters = name.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
+    document.getElementById('company-card').innerHTML = `
+        <div class="company-logo-placeholder">${letters}</div>
+        <div style="font-size:var(--font-size-lg); font-weight:var(--font-weight-bold); margin-bottom:var(--space-1);">${name}</div>
+        ${p.industry ? `<div style="font-size:var(--font-size-sm); color:var(--color-text-muted);"><i class="fa-solid fa-industry"></i> ${utils.escapeHtml(p.industry)}</div>` : ''}
+        ${p.location ? `<div style="font-size:var(--font-size-sm); color:var(--color-text-muted); margin-top:4px;"><i class="fa-solid fa-location-dot"></i> ${utils.escapeHtml(p.location)}</div>` : ''}
+        ${p.company_size ? `<div style="font-size:var(--font-size-sm); color:var(--color-text-muted); margin-top:4px;"><i class="fa-solid fa-users"></i> ${utils.escapeHtml(p.company_size)}</div>` : ''}
+        ${p.website ? `<a href="${utils.escapeHtml(p.website)}" target="_blank" class="btn btn--outline btn--sm btn--full" style="margin-top:var(--space-4);"><i class="fa-solid fa-link"></i> Visit Website</a>` : ''}
+    `;
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,279 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SkillBridge — Admin user management.">
+    <title>SkillBridge | User Management</title>
+
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../assets/css/variables.css">
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/layout.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+
+    <style>
+        .user-table { width: 100%; border-collapse: collapse; }
+        .user-table th { text-align:left; font-size:var(--font-size-xs); font-weight:var(--font-weight-semibold); color:var(--color-text-muted); text-transform:uppercase; letter-spacing:0.05em; padding:var(--space-3) var(--space-4); border-bottom:2px solid var(--color-border); }
+        .user-table td { padding:var(--space-4); border-bottom:1px solid var(--color-border); font-size:var(--font-size-sm); vertical-align:middle; }
+        .user-table tr:hover td { background:var(--color-surface-low); }
+        .user-table tr:last-child td { border-bottom:none; }
+        .user-avatar-sm { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:var(--font-size-xs); font-weight:var(--font-weight-bold); color:#fff; }
+        .role-filter { display:flex; gap:var(--space-2); margin-bottom:var(--space-4); flex-wrap:wrap; }
+        .search-bar { display:flex; align-items:center; gap:var(--space-2); background:var(--color-surface-low); border:1px solid var(--color-border); border-radius:var(--radius-full); padding:var(--space-2) var(--space-4); max-width:300px; margin-bottom:var(--space-4); }
+        .search-bar input { border:none; background:transparent; outline:none; font-size:var(--font-size-sm); color:var(--color-text-primary); flex:1; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+</head>
+<body>
+
+<div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+        <a href="dashboard.html" class="sidebar__brand">
+            <div class="sidebar__brand-icon">SB</div>
+            <span class="sidebar__brand-text">Admin Panel</span>
+        </a>
+        <nav class="sidebar__nav">
+            <a href="dashboard.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-gauge-high"></i></span><span class="sidebar__text">Overview</span></a>
+            <a href="users.html"     class="sidebar__link active"><span class="sidebar__icon"><i class="fa-solid fa-users"></i></span><span class="sidebar__text">User Management</span></a>
+            <a href="posts.html"     class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-clipboard-list"></i></span><span class="sidebar__text">Post Moderation</span></a>
+            <span class="sidebar__nav-section">System</span>
+            <a href="analytics.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-chart-line"></i></span><span class="sidebar__text">Analytics</span></a>
+            <a href="logs.html"      class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-scroll"></i></span><span class="sidebar__text">Audit Logs</span></a>
+        </nav>
+        <div class="sidebar__footer">
+            <div class="sidebar__user">
+                <div class="sidebar__avatar" id="user-avatar" style="background:var(--color-danger);">A</div>
+                <div class="sidebar__user-info">
+                    <div class="sidebar__user-name" id="user-name">Admin</div>
+                    <div class="sidebar__user-role" style="color:var(--color-danger);">Administrator</div>
+                </div>
+            </div>
+            <button class="btn btn--ghost btn--full" id="btn-logout" style="margin-top:var(--space-2); justify-content:flex-start; color:var(--color-danger); font-size:var(--font-size-xs);"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+        </div>
+    </aside>
+
+    <div class="app-main">
+        <header class="app-header">
+            <div class="header__left">
+                <button class="header__menu-btn" id="menu-btn"><i class="fa-solid fa-bars"></i></button>
+                <span class="header__page-title">User Management</span>
+            </div>
+            <div class="header__right">
+                <span style="font-size:var(--font-size-xs); color:var(--color-danger); font-weight:var(--font-weight-semibold); background:var(--color-danger-bg); padding:var(--space-1) var(--space-3); border-radius:var(--radius-full);"><i class="fa-solid fa-shield-halved"></i> Admin Mode</span>
+            </div>
+        </header>
+
+        <main class="page-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">User Management</h1>
+                    <p class="page-subtitle" id="user-count">Loading all users…</p>
+                </div>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass" style="color:var(--color-text-muted);"></i>
+                <input type="search" id="search-input" placeholder="Search by name or email…">
+            </div>
+
+            <div class="role-filter">
+                <button class="filter-tab active" data-role="">All</button>
+                <button class="filter-tab" data-role="student"><i class="fa-solid fa-graduation-cap"></i> Students</button>
+                <button class="filter-tab" data-role="company"><i class="fa-solid fa-building"></i> Companies</button>
+                <button class="filter-tab" data-role="admin"><i class="fa-solid fa-shield-halved"></i> Admins</button>
+                <button class="filter-tab" data-role="banned"><i class="fa-solid fa-ban"></i> Banned</button>
+            </div>
+
+            <!-- Table -->
+            <div class="card" id="users-card">
+                <div id="users-body">
+                    <div class="skeleton" style="height:52px; margin-bottom:var(--space-2);"></div>
+                    <div class="skeleton" style="height:52px; margin-bottom:var(--space-2);"></div>
+                    <div class="skeleton" style="height:52px;"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Confirm action modal -->
+<div id="confirm-overlay" class="modal-overlay" style="display:none;">
+    <div class="modal" style="max-width:420px;">
+        <div class="modal__header">
+            <h2 class="modal__title" id="confirm-title">Confirm Action</h2>
+            <button class="modal__close" onclick="closeConfirm()">×</button>
+        </div>
+        <p style="font-size:var(--font-size-sm); color:var(--color-text-secondary); margin-bottom:var(--space-5);" id="confirm-body"></p>
+        <div class="modal__footer">
+            <button class="btn btn--secondary" onclick="closeConfirm()">Cancel</button>
+            <button class="btn btn--danger" id="confirm-ok">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/utils.js"></script>
+<script>
+let currentUser  = null;
+let allUsers     = [];
+let activeRole   = '';
+let searchQuery  = '';
+let pendingAction = null;
+let searchTimer  = null;
+
+(async () => {
+    currentUser = await auth.requireRole('admin');
+    if (!currentUser) return;
+    document.getElementById('user-name').textContent     = currentUser.full_name;
+    document.getElementById('user-avatar').textContent   = utils.initials(currentUser.full_name);
+    loadUsers();
+})();
+
+document.getElementById('menu-btn').addEventListener('click', () =>
+    document.getElementById('sidebar').classList.toggle('open'));
+document.getElementById('btn-logout').addEventListener('click', async () =>
+    await auth.logout());
+
+document.querySelectorAll('.filter-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeRole  = btn.dataset.role;
+        renderTable();
+    });
+});
+
+document.getElementById('search-input').addEventListener('input', e => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        searchQuery = e.target.value.toLowerCase();
+        renderTable();
+    }, 300);
+});
+
+document.getElementById('confirm-ok').addEventListener('click', async () => {
+    if (!pendingAction) return;
+    const btn = document.getElementById('confirm-ok');
+    utils.setLoading(btn, true);
+    try {
+        const { type, id, name } = pendingAction;
+        if (type === 'ban') {
+            await api.patch(`/admin/users/${id}/ban`, {});
+            toast.success('User Banned', `${name} has been banned.`);
+            const u = allUsers.find(x => x.id === id);
+            if (u) u.is_banned = 1;
+        } else {
+            await api.patch(`/admin/users/${id}/unban`, {});
+            toast.success('User Unbanned', `${name} has been reinstated.`);
+            const u = allUsers.find(x => x.id === id);
+            if (u) u.is_banned = 0;
+        }
+        closeConfirm();
+        renderTable();
+    } catch (err) {
+        toast.error('Error', err.message || 'Action failed.');
+    } finally {
+        utils.setLoading(btn, false);
+    }
+});
+
+function closeConfirm() {
+    document.getElementById('confirm-overlay').style.display = 'none';
+    pendingAction = null;
+}
+
+function openConfirm(type, id, name) {
+    pendingAction = { type, id, name };
+    document.getElementById('confirm-title').textContent = type === 'ban' ? '<i class="fa-solid fa-ban"></i> Ban User?' : '<i class="fa-solid fa-check"></i> Unban User?';
+    document.getElementById('confirm-body').innerHTML =
+        type === 'ban'
+            ? `Are you sure you want to ban <strong>${utils.escapeHtml(name)}</strong>? They will not be able to log in.`
+            : `Are you sure you want to reinstate <strong>${utils.escapeHtml(name)}</strong>? They will regain access.`;
+    document.getElementById('confirm-ok').textContent = type === 'ban' ? 'Yes, Ban User' : 'Yes, Unban';
+    document.getElementById('confirm-ok').className = type === 'ban' ? 'btn btn--danger' : 'btn btn--primary';
+    document.getElementById('confirm-overlay').style.display = 'flex';
+}
+
+async function loadUsers() {
+    try {
+        allUsers = await api.get('/admin/users');
+        document.getElementById('user-count').textContent =
+            `${allUsers.length} user${allUsers.length !== 1 ? 's' : ''} registered`;
+        renderTable();
+    } catch (err) {
+        document.getElementById('users-body').innerHTML =
+            `<p style="text-align:center;padding:var(--space-6);color:var(--color-text-muted);">Failed to load: ${utils.escapeHtml(err.message)}</p>`;
+    }
+}
+
+function renderTable() {
+    const el = document.getElementById('users-body');
+    let filtered = allUsers;
+
+    if (activeRole === 'banned') {
+        filtered = filtered.filter(u => u.is_banned);
+    } else if (activeRole) {
+        filtered = filtered.filter(u => u.role === activeRole);
+    }
+
+    if (searchQuery) {
+        filtered = filtered.filter(u =>
+            u.full_name.toLowerCase().includes(searchQuery) ||
+            u.email.toLowerCase().includes(searchQuery)
+        );
+    }
+
+    if (!filtered.length) {
+        el.innerHTML = `<div class="empty-state"><div class="empty-state__icon"><i class="fa-solid fa-users"></i></div><div class="empty-state__title">No users found</div><div class="empty-state__text">Try adjusting your search or filter.</div></div>`;
+        return;
+    }
+
+    const roleColor = { student:'var(--color-primary)', company:'var(--color-success)', admin:'var(--color-danger)' };
+    el.innerHTML = `
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${filtered.map(u => {
+                    const isSelf = u.id === currentUser.user_id;
+                    const action = u.is_banned
+                        ? `<button class="btn btn--primary btn--sm" onclick="openConfirm('unban', ${u.id}, '${utils.escapeHtml(u.full_name).replace(/'/g,"\\'")}')"><i class="fa-solid fa-check"></i> Unban</button>`
+                        : isSelf ? `<span style="font-size:var(--font-size-xs); color:var(--color-text-muted);">—</span>`
+                        : `<button class="btn btn--danger-outline btn--sm" onclick="openConfirm('ban', ${u.id}, '${utils.escapeHtml(u.full_name).replace(/'/g,"\\'")}')"><i class="fa-solid fa-ban"></i> Ban</button>`;
+                    return `
+                    <tr>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:var(--space-3);">
+                                <div class="user-avatar-sm" style="background:${roleColor[u.role] || 'var(--color-primary)'};">
+                                    ${utils.initials(u.full_name)}
+                                </div>
+                                <span style="font-weight:var(--font-weight-medium);">${utils.escapeHtml(u.full_name)}</span>
+                                ${isSelf ? `<span style="font-size:var(--font-size-xs); background:var(--color-primary-surface); color:var(--color-primary); border-radius:var(--radius-full); padding:1px 6px;">You</span>` : ''}
+                            </div>
+                        </td>
+                        <td style="color:var(--color-text-muted);">${utils.escapeHtml(u.email)}</td>
+                        <td><span class="badge badge--${u.role}">${u.role}</span></td>
+                        <td>${u.is_banned ? `<span class="badge badge--rejected">Banned</span>` : `<span class="badge badge--active">Active</span>`}</td>
+                        <td style="white-space:nowrap;">${utils.formatDate(u.created_at)}</td>
+                        <td>${action}</td>
+                    </tr>`;
+                }).join('')}
+            </tbody>
+        </table>`;
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,267 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SkillBridge — Admin post moderation.">
+    <title>SkillBridge | Post Moderation</title>
+
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../assets/css/variables.css">
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/layout.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+
+    <style>
+        .post-table { width:100%; border-collapse:collapse; }
+        .post-table th { text-align:left; font-size:var(--font-size-xs); font-weight:var(--font-weight-semibold); color:var(--color-text-muted); text-transform:uppercase; letter-spacing:0.05em; padding:var(--space-3) var(--space-4); border-bottom:2px solid var(--color-border); }
+        .post-table td { padding:var(--space-4); border-bottom:1px solid var(--color-border); font-size:var(--font-size-sm); vertical-align:middle; }
+        .post-table tr:hover td { background:var(--color-surface-low); }
+        .post-table tr:last-child td { border-bottom:none; }
+        .ptitle { font-weight:var(--font-weight-semibold); color:var(--color-text-primary); max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .search-bar { display:flex; align-items:center; gap:var(--space-2); background:var(--color-surface-low); border:1px solid var(--color-border); border-radius:var(--radius-full); padding:var(--space-2) var(--space-4); max-width:300px; margin-bottom:var(--space-4); }
+        .search-bar input { border:none; background:transparent; outline:none; font-size:var(--font-size-sm); color:var(--color-text-primary); flex:1; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+</head>
+<body>
+
+<div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+        <a href="dashboard.html" class="sidebar__brand">
+            <div class="sidebar__brand-icon">SB</div>
+            <span class="sidebar__brand-text">Admin Panel</span>
+        </a>
+        <nav class="sidebar__nav">
+            <a href="dashboard.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-gauge-high"></i></span><span class="sidebar__text">Overview</span></a>
+            <a href="users.html"     class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-users"></i></span><span class="sidebar__text">User Management</span></a>
+            <a href="posts.html"     class="sidebar__link active"><span class="sidebar__icon"><i class="fa-solid fa-clipboard-list"></i></span><span class="sidebar__text">Post Moderation</span></a>
+            <span class="sidebar__nav-section">System</span>
+            <a href="analytics.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-chart-line"></i></span><span class="sidebar__text">Analytics</span></a>
+            <a href="logs.html"      class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-scroll"></i></span><span class="sidebar__text">Audit Logs</span></a>
+        </nav>
+        <div class="sidebar__footer">
+            <div class="sidebar__user">
+                <div class="sidebar__avatar" id="user-avatar" style="background:var(--color-danger);">A</div>
+                <div class="sidebar__user-info">
+                    <div class="sidebar__user-name" id="user-name">Admin</div>
+                    <div class="sidebar__user-role" style="color:var(--color-danger);">Administrator</div>
+                </div>
+            </div>
+            <button class="btn btn--ghost btn--full" id="btn-logout" style="margin-top:var(--space-2); justify-content:flex-start; color:var(--color-danger); font-size:var(--font-size-xs);"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+        </div>
+    </aside>
+
+    <div class="app-main">
+        <header class="app-header">
+            <div class="header__left">
+                <button class="header__menu-btn" id="menu-btn"><i class="fa-solid fa-bars"></i></button>
+                <span class="header__page-title">Post Moderation</span>
+            </div>
+            <div class="header__right">
+                <span style="font-size:var(--font-size-xs); color:var(--color-danger); font-weight:var(--font-weight-semibold); background:var(--color-danger-bg); padding:var(--space-1) var(--space-3); border-radius:var(--radius-full);"><i class="fa-solid fa-shield-halved"></i> Admin Mode</span>
+            </div>
+        </header>
+
+        <main class="page-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Post Moderation</h1>
+                    <p class="page-subtitle" id="post-count">Loading posts…</p>
+                </div>
+            </div>
+
+            <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass" style="color:var(--color-text-muted);"></i>
+                <input type="search" id="search-input" placeholder="Search by title or company…">
+            </div>
+
+            <div style="display:flex; gap:var(--space-2); margin-bottom:var(--space-4); flex-wrap:wrap;">
+                <button class="filter-tab active" data-type="">All</button>
+                <button class="filter-tab" data-type="internship">Internships</button>
+                <button class="filter-tab" data-type="job">Jobs</button>
+                <button class="filter-tab" data-type="challenge">Challenges</button>
+            </div>
+
+            <div class="card">
+                <div id="posts-body">
+                    <div class="skeleton" style="height:52px; margin-bottom:var(--space-2);"></div>
+                    <div class="skeleton" style="height:52px; margin-bottom:var(--space-2);"></div>
+                    <div class="skeleton" style="height:52px;"></div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination" style="margin-top:var(--space-6);"></div>
+        </main>
+    </div>
+</div>
+
+<!-- Delete confirm modal -->
+<div id="delete-overlay" class="modal-overlay" style="display:none;">
+    <div class="modal" style="max-width:420px;">
+        <div class="modal__header">
+            <h2 class="modal__title"><i class="fa-solid fa-trash"></i> Remove Post?</h2>
+            <button class="modal__close" onclick="closeDeleteModal()">×</button>
+        </div>
+        <p style="font-size:var(--font-size-sm); color:var(--color-text-secondary); margin-bottom:var(--space-5);">
+            Remove <strong id="del-post-name"></strong>? This will also remove all associated applications. This cannot be undone.
+        </p>
+        <div class="modal__footer">
+            <button class="btn btn--secondary" onclick="closeDeleteModal()">Cancel</button>
+            <button class="btn btn--danger" id="del-confirm">Yes, Remove</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/utils.js"></script>
+<script>
+let currentUser   = null;
+let allPosts      = [];
+let activeType    = '';
+let searchQuery   = '';
+let deleteTarget  = null;
+let currentPage   = 1;
+let totalPages    = 1;
+let searchTimer   = null;
+
+(async () => {
+    currentUser = await auth.requireRole('admin');
+    if (!currentUser) return;
+    document.getElementById('user-name').textContent   = currentUser.full_name;
+    document.getElementById('user-avatar').textContent = utils.initials(currentUser.full_name);
+    loadPosts();
+})();
+
+document.getElementById('menu-btn').addEventListener('click', () =>
+    document.getElementById('sidebar').classList.toggle('open'));
+document.getElementById('btn-logout').addEventListener('click', async () =>
+    await auth.logout());
+
+document.querySelectorAll('.filter-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeType  = btn.dataset.type;
+        currentPage = 1;
+        loadPosts();
+    });
+});
+
+document.getElementById('search-input').addEventListener('input', e => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        searchQuery = e.target.value.trim();
+        currentPage = 1;
+        loadPosts();
+    }, 400);
+});
+
+document.getElementById('del-confirm').addEventListener('click', async () => {
+    if (!deleteTarget) return;
+    const btn = document.getElementById('del-confirm');
+    utils.setLoading(btn, true);
+    try {
+        await api.delete(`/admin/posts/${deleteTarget}`);
+        toast.success('Post Removed', 'The post has been taken down.');
+        closeDeleteModal();
+        await loadPosts();
+    } catch (err) {
+        toast.error('Error', err.message || 'Failed to remove post.');
+    } finally {
+        utils.setLoading(btn, false);
+    }
+});
+
+async function loadPosts() {
+    const body = document.getElementById('posts-body');
+    body.innerHTML = `<div class="skeleton" style="height:52px;margin-bottom:var(--space-2);"></div><div class="skeleton" style="height:52px;"></div>`;
+
+    const params = { page: currentPage };
+    if (activeType)   params.type   = activeType;
+    if (searchQuery)  params.search = searchQuery;
+
+    try {
+        const data  = await api.get('/admin/posts', params);
+        allPosts    = data.items || [];
+        totalPages  = data.pagination?.total_pages || 1;
+        const total = data.pagination?.total_items || allPosts.length;
+
+        document.getElementById('post-count').textContent =
+            `${total} post${total !== 1 ? 's' : ''} on the platform`;
+
+        renderTable();
+        renderPagination(data.pagination);
+    } catch (err) {
+        body.innerHTML = `<p style="text-align:center;padding:var(--space-6);color:var(--color-text-muted);">Failed to load: ${utils.escapeHtml(err.message)}</p>`;
+    }
+}
+
+function renderTable() {
+    const body = document.getElementById('posts-body');
+    if (!allPosts.length) {
+        body.innerHTML = `<div class="empty-state"><div class="empty-state__icon"><i class="fa-solid fa-clipboard-list"></i></div><div class="empty-state__title">No posts found</div></div>`;
+        return;
+    }
+    body.innerHTML = `
+        <table class="post-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Company</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Applicants</th>
+                    <th>Posted</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${allPosts.map(p => `
+                <tr>
+                    <td class="ptitle">${utils.escapeHtml(p.title)}</td>
+                    <td style="color:var(--color-text-muted);">${utils.escapeHtml(p.company_name || '—')}</td>
+                    <td><span class="badge badge--${p.type}">${p.type}</span></td>
+                    <td><span class="badge badge--${p.status}">${p.status}</span></td>
+                    <td style="font-weight:var(--font-weight-semibold);">${p.applications_count}</td>
+                    <td style="white-space:nowrap; color:var(--color-text-muted);">${utils.timeAgo(p.created_at)}</td>
+                    <td>
+                        <button class="btn btn--danger-outline btn--sm"
+                            onclick="openDeleteModal(${p.id}, '${utils.escapeHtml(p.title).replace(/'/g,"\\'")}')">
+                            <i class="fa-solid fa-trash"></i> Remove
+                        </button>
+                    </td>
+                </tr>`).join('')}
+            </tbody>
+        </table>`;
+}
+
+function renderPagination(pg) {
+    const el = document.getElementById('pagination');
+    if (!pg || pg.total_pages <= 1) { el.innerHTML = ''; return; }
+    let html = `<button class="page-btn" onclick="goPage(${pg.current_page - 1})" ${pg.current_page <= 1 ? 'disabled' : ''}>‹</button>`;
+    for (let i = 1; i <= pg.total_pages; i++) {
+        html += `<button class="page-btn ${i === pg.current_page ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+    }
+    html += `<button class="page-btn" onclick="goPage(${pg.current_page + 1})" ${pg.current_page >= pg.total_pages ? 'disabled' : ''}>›</button>`;
+    el.innerHTML = html;
+}
+
+function goPage(p) { currentPage = p; loadPosts(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+function openDeleteModal(id, name) {
+    deleteTarget = id;
+    document.getElementById('del-post-name').textContent = name;
+    document.getElementById('delete-overlay').style.display = 'flex';
+}
+function closeDeleteModal() {
+    document.getElementById('delete-overlay').style.display = 'none';
+    deleteTarget = null;
+}
+</script>
+
+</body>
+</html>

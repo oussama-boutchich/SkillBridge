@@ -1,0 +1,152 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SkillBridge — Admin audit logs.">
+    <title>SkillBridge | Audit Logs</title>
+
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../assets/css/variables.css">
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/layout.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+
+    <style>
+        .log-table { width:100%; border-collapse:collapse; }
+        .log-table th { text-align:left; font-size:var(--font-size-xs); font-weight:var(--font-weight-semibold); color:var(--color-text-muted); text-transform:uppercase; letter-spacing:0.05em; padding:var(--space-3) var(--space-4); border-bottom:2px solid var(--color-border); }
+        .log-table td { padding:var(--space-4); border-bottom:1px solid var(--color-border); font-size:var(--font-size-sm); vertical-align:middle; }
+        .log-table tr:hover td { background:var(--color-surface-low); }
+        .log-table tr:last-child td { border-bottom:none; }
+        .action-pill { padding:3px var(--space-3); border-radius:var(--radius-full); font-size:var(--font-size-xs); font-weight:var(--font-weight-semibold); }
+        .action-pill--ban    { background:var(--color-danger-bg);  color:var(--color-danger); }
+        .action-pill--unban  { background:var(--color-success-bg); color:var(--color-success); }
+        .action-pill--delete { background:var(--color-warning-bg); color:#92400e; }
+        .action-pill--other  { background:var(--color-surface-low); color:var(--color-text-muted); }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+</head>
+<body>
+
+<div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+        <a href="dashboard.html" class="sidebar__brand">
+            <div class="sidebar__brand-icon">SB</div>
+            <span class="sidebar__brand-text">Admin Panel</span>
+        </a>
+        <nav class="sidebar__nav">
+            <a href="dashboard.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-gauge-high"></i></span><span class="sidebar__text">Overview</span></a>
+            <a href="users.html"     class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-users"></i></span><span class="sidebar__text">User Management</span></a>
+            <a href="posts.html"     class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-clipboard-list"></i></span><span class="sidebar__text">Post Moderation</span></a>
+            <span class="sidebar__nav-section">System</span>
+            <a href="analytics.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-chart-line"></i></span><span class="sidebar__text">Analytics</span></a>
+            <a href="logs.html"      class="sidebar__link active"><span class="sidebar__icon"><i class="fa-solid fa-scroll"></i></span><span class="sidebar__text">Audit Logs</span></a>
+        </nav>
+        <div class="sidebar__footer">
+            <div class="sidebar__user">
+                <div class="sidebar__avatar" id="user-avatar" style="background:var(--color-danger);">A</div>
+                <div class="sidebar__user-info">
+                    <div class="sidebar__user-name" id="user-name">Admin</div>
+                    <div class="sidebar__user-role" style="color:var(--color-danger);">Administrator</div>
+                </div>
+            </div>
+            <button class="btn btn--ghost btn--full" id="btn-logout" style="margin-top:var(--space-2); justify-content:flex-start; color:var(--color-danger); font-size:var(--font-size-xs);"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+        </div>
+    </aside>
+
+    <div class="app-main">
+        <header class="app-header">
+            <div class="header__left">
+                <button class="header__menu-btn" id="menu-btn"><i class="fa-solid fa-bars"></i></button>
+                <span class="header__page-title">Audit Logs</span>
+            </div>
+            <div class="header__right">
+                <span style="font-size:var(--font-size-xs); color:var(--color-danger); font-weight:var(--font-weight-semibold); background:var(--color-danger-bg); padding:var(--space-1) var(--space-3); border-radius:var(--radius-full);"><i class="fa-solid fa-shield-halved"></i> Admin Mode</span>
+            </div>
+        </header>
+
+        <main class="page-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Audit Logs</h1>
+                    <p class="page-subtitle">A complete record of all administrator actions on the platform.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div id="logs-body">
+                    <div class="skeleton" style="height:52px; margin-bottom:var(--space-2);"></div>
+                    <div class="skeleton" style="height:52px; margin-bottom:var(--space-2);"></div>
+                    <div class="skeleton" style="height:52px;"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/utils.js"></script>
+<script>
+(async () => {
+    const currentUser = await auth.requireRole('admin');
+    if (!currentUser) return;
+    document.getElementById('user-name').textContent   = currentUser.full_name;
+    document.getElementById('user-avatar').textContent = utils.initials(currentUser.full_name);
+
+    try {
+        const logs = await api.get('/admin/logs');
+        renderLogs(logs);
+    } catch (err) {
+        document.getElementById('logs-body').innerHTML =
+            `<p style="text-align:center;padding:var(--space-6);color:var(--color-text-muted);">Failed to load logs: ${utils.escapeHtml(err.message)}</p>`;
+    }
+})();
+
+document.getElementById('menu-btn').addEventListener('click', () =>
+    document.getElementById('sidebar').classList.toggle('open'));
+document.getElementById('btn-logout').addEventListener('click', async () =>
+    await auth.logout());
+
+function renderLogs(logs) {
+    const body = document.getElementById('logs-body');
+    if (!logs || !logs.length) {
+        body.innerHTML = `<div class="empty-state"><div class="empty-state__icon"><i class="fa-solid fa-scroll"></i></div><div class="empty-state__title">No admin actions recorded yet</div><div class="empty-state__text">Ban a user or remove a post to generate an audit entry.</div></div>`;
+        return;
+    }
+
+    const cls = a =>
+        a.includes('ban') && !a.includes('unban') ? 'ban' :
+        a.includes('unban') ? 'unban' :
+        a.includes('delete') ? 'delete' : 'other';
+
+    body.innerHTML = `
+        <table class="log-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Action</th>
+                    <th>Target</th>
+                    <th>Description</th>
+                    <th>Performed by</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${logs.map((log, i) => `
+                <tr>
+                    <td style="color:var(--color-text-muted);">${i + 1}</td>
+                    <td><span class="action-pill action-pill--${cls(log.action)}">${log.action}</span></td>
+                    <td style="color:var(--color-text-muted);">${log.target_type} #${log.target_id}</td>
+                    <td style="max-width:300px;">${utils.escapeHtml(log.description || '—')}</td>
+                    <td style="color:var(--color-text-muted);">${utils.escapeHtml(log.admin_email || 'system')}</td>
+                    <td style="white-space:nowrap; color:var(--color-text-muted);">${utils.timeAgo(log.created_at)}</td>
+                </tr>`).join('')}
+            </tbody>
+        </table>`;
+}
+</script>
+
+</body>
+</html>

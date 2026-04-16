@@ -1,0 +1,477 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SkillBridge — Manage and showcase your certificates.">
+    <title>SkillBridge | My Certificates</title>
+
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../assets/css/variables.css">
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/layout.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+
+    <style>
+        .cert-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: var(--space-5);
+        }
+
+        .cert-card {
+            background:    var(--color-surface);
+            border:        1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding:       var(--space-5);
+            box-shadow:    var(--shadow-xs);
+            display:       flex;
+            flex-direction: column;
+            gap:           var(--space-3);
+            transition:    transform var(--transition-base), box-shadow var(--transition-base);
+            position:      relative;
+        }
+
+        .cert-card:hover {
+            transform:  translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .cert-card__top {
+            display:     flex;
+            align-items: flex-start;
+            gap:         var(--space-3);
+        }
+
+        .cert-card__badge {
+            width:         52px;
+            height:        52px;
+            flex-shrink:   0;
+            border-radius: var(--radius-md);
+            background:    linear-gradient(135deg, #f59e0b22, #f59e0b44);
+            border:        1px solid #f59e0b55;
+            display:       flex;
+            align-items:   center;
+            justify-content: center;
+            font-size:     1.6rem;
+        }
+
+        .cert-card__title {
+            font-size:   var(--font-size-md);
+            font-weight: var(--font-weight-semibold);
+            color:       var(--color-text-primary);
+            line-height: 1.3;
+        }
+
+        .cert-card__issuer {
+            font-size:  var(--font-size-sm);
+            color:      var(--color-text-muted);
+            margin-top: 2px;
+        }
+
+        .cert-card__meta {
+            display:     flex;
+            align-items: center;
+            gap:         var(--space-3);
+            font-size:   var(--font-size-xs);
+            color:       var(--color-text-muted);
+        }
+
+        .cert-card__desc {
+            font-size:  var(--font-size-sm);
+            color:      var(--color-text-secondary);
+            line-height: 1.6;
+        }
+
+        .cert-card__actions {
+            display:         flex;
+            justify-content: space-between;
+            align-items:     center;
+            margin-top:      auto;
+            padding-top:     var(--space-3);
+            border-top:      1px solid var(--color-border);
+        }
+
+        /* Add cert button card */
+        .cert-add-card {
+            background:    var(--color-primary-surface);
+            border:        2px dashed var(--color-primary-border);
+            border-radius: var(--radius-lg);
+            display:       flex;
+            flex-direction: column;
+            align-items:   center;
+            justify-content: center;
+            padding:       var(--space-8);
+            gap:           var(--space-3);
+            cursor:        pointer;
+            transition:    background var(--transition-fast), border-color var(--transition-fast);
+            text-align:    center;
+            min-height:    200px;
+        }
+
+        .cert-add-card:hover {
+            background:   rgba(0, 74, 198, 0.08);
+            border-color: var(--color-primary);
+        }
+
+        .cert-add-card__icon {
+            font-size:     2rem;
+            color:         var(--color-primary);
+            width:         56px;
+            height:        56px;
+            border-radius: 50%;
+            background:    rgba(0,74,198,0.12);
+            display:       flex;
+            align-items:   center;
+            justify-content: center;
+        }
+
+        .cert-add-card__title {
+            font-size:   var(--font-size-md);
+            font-weight: var(--font-weight-semibold);
+            color:       var(--color-primary);
+        }
+
+        .cert-add-card__subtitle {
+            font-size: var(--font-size-sm);
+            color:     var(--color-text-muted);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <a href="dashboard.html" class="sidebar__brand">
+            <div class="sidebar__brand-icon">SB</div>
+            <span class="sidebar__brand-text">SkillBridge</span>
+        </a>
+        <nav class="sidebar__nav">
+            <a href="dashboard.html"    class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-gauge-high"></i></span><span class="sidebar__text">Dashboard</span></a>
+            <a href="browse-jobs.html"  class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-magnifying-glass"></i></span><span class="sidebar__text">Browse Opportunities</span></a>
+            <a href="applications.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-file-lines"></i></span><span class="sidebar__text">My Applications</span></a>
+            <a href="certificates.html" class="sidebar__link active"><span class="sidebar__icon"><i class="fa-solid fa-trophy"></i></span><span class="sidebar__text">Certificates</span></a>
+            <span class="sidebar__nav-section">Account</span>
+            <a href="profile.html"       class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-circle-user"></i></span><span class="sidebar__text">My Profile</span></a>
+            <a href="notifications.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-bell"></i></span><span class="sidebar__text">Notifications</span><span class="sidebar__badge" id="notif-badge" style="display:none;"></span></a>
+        </nav>
+        <div class="sidebar__footer">
+            <div class="sidebar__user">
+                <div class="sidebar__avatar" id="user-avatar">?</div>
+                <div class="sidebar__user-info">
+                    <div class="sidebar__user-name" id="user-name">Loading…</div>
+                    <div class="sidebar__user-role">Student</div>
+                </div>
+            </div>
+            <button class="btn btn--ghost btn--full" id="btn-logout" style="margin-top:var(--space-2); justify-content:flex-start; color:var(--color-danger); font-size:var(--font-size-xs);"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="app-main">
+        <header class="app-header">
+            <div class="header__left">
+                <button class="header__menu-btn" id="menu-btn"><i class="fa-solid fa-bars"></i></button>
+                <span class="header__page-title">My Certificates</span>
+            </div>
+            <div class="header__right">
+                <button class="btn btn--primary btn--sm" id="btn-open-add">+ Add Certificate</button>
+                <button class="header__notif-btn" onclick="location.href='notifications.html'"><i class="fa-solid fa-bell"></i>
+                    <span class="header__notif-count" id="header-notif-count" style="display:none;"></span>
+                </button>
+                <button class="header__avatar-btn" onclick="location.href='profile.html'">
+                    <div class="header__avatar avatar avatar--md" id="header-avatar">?</div>
+                </button>
+            </div>
+        </header>
+
+        <main class="page-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Certificates</h1>
+                    <p class="page-subtitle" id="cert-count-label">Loading your certificates…</p>
+                </div>
+                <button class="btn btn--primary" id="btn-open-add2">+ Add Certificate</button>
+            </div>
+
+            <!-- Certificates Grid -->
+            <div class="cert-grid" id="cert-grid">
+                <div class="skeleton" style="height:220px; border-radius:var(--radius-lg);"></div>
+                <div class="skeleton" style="height:220px; border-radius:var(--radius-lg);"></div>
+                <div class="skeleton" style="height:220px; border-radius:var(--radius-lg);"></div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Add Certificate Modal -->
+<div id="add-cert-overlay" class="modal-overlay" style="display:none;">
+    <div class="modal">
+        <div class="modal__header">
+            <h2 class="modal__title"><i class="fa-solid fa-trophy"></i> Add Certificate</h2>
+            <button class="modal__close" id="modal-close">×</button>
+        </div>
+
+        <div id="cert-alert" class="alert alert--error" style="display:none;">
+            <span class="alert__icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
+            <span class="alert__body" id="cert-alert-text"></span>
+        </div>
+
+        <form id="add-cert-form" novalidate>
+            <div class="form-group">
+                <label for="cert-title" class="form-label">Certificate Title <span class="required">*</span></label>
+                <input type="text" id="cert-title" class="form-control" placeholder="e.g. Web Development Fundamentals" required>
+                <span class="form-error" id="err-title" style="display:none;"></span>
+            </div>
+            <div class="form-group">
+                <label for="cert-issuer" class="form-label">Issuing Organisation <span class="required">*</span></label>
+                <input type="text" id="cert-issuer" class="form-control" placeholder="e.g. Coursera, Udemy, Google" required>
+                <span class="form-error" id="err-issuer" style="display:none;"></span>
+            </div>
+            <div class="form-group">
+                <label for="cert-date" class="form-label">Issue Date <span class="required">*</span></label>
+                <input type="date" id="cert-date" class="form-control" required>
+                <span class="form-error" id="err-date" style="display:none;"></span>
+            </div>
+            <div class="form-group">
+                <label for="cert-url" class="form-label">Credential URL <span style="color:var(--color-text-muted); font-weight:400;">(optional)</span></label>
+                <input type="url" id="cert-url" class="form-control" placeholder="https://coursera.org/verify/…">
+                <span class="form-error" id="err-url" style="display:none;"></span>
+            </div>
+            <div class="form-group">
+                <label for="cert-desc" class="form-label">Description <span style="color:var(--color-text-muted); font-weight:400;">(optional)</span></label>
+                <textarea id="cert-desc" class="form-control" placeholder="Brief description of what you learned…" style="min-height:80px;"></textarea>
+            </div>
+            <div class="modal__footer">
+                <button type="button" class="btn btn--secondary" id="modal-cancel">Cancel</button>
+                <button type="submit" id="btn-add-cert" class="btn btn--primary">Add Certificate</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div id="delete-overlay" class="modal-overlay" style="display:none;">
+    <div class="modal" style="max-width:420px;">
+        <div class="modal__header">
+            <h2 class="modal__title">Delete Certificate?</h2>
+            <button class="modal__close" id="del-modal-close">×</button>
+        </div>
+        <p style="font-size:var(--font-size-sm); color:var(--color-text-secondary); margin-bottom:var(--space-5);">
+            This will permanently delete <strong id="del-cert-name"></strong>. This action cannot be undone.
+        </p>
+        <div class="modal__footer">
+            <button class="btn btn--secondary" id="del-cancel">Cancel</button>
+            <button class="btn btn--danger" id="del-confirm">Yes, Delete</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/utils.js"></script>
+<script>
+let currentUser  = null;
+let certificates = [];
+let deleteTargetId   = null;
+
+(async () => {
+    currentUser = await auth.requireRole('student');
+    if (!currentUser) return;
+
+    const init = utils.initials(currentUser.full_name);
+    document.getElementById('user-avatar').textContent   = init;
+    document.getElementById('user-name').textContent     = currentUser.full_name;
+    document.getElementById('header-avatar').textContent = init;
+
+    // notif count
+    try {
+        const n = await api.get('/notifications');
+        if (n.unread > 0) {
+            document.getElementById('notif-badge').style.display         = '';
+            document.getElementById('notif-badge').textContent           = n.unread;
+            document.getElementById('header-notif-count').style.display  = '';
+            document.getElementById('header-notif-count').textContent    = n.unread;
+        }
+    } catch {}
+
+    loadCerts();
+})();
+
+// Sidebar / logout
+document.getElementById('menu-btn').addEventListener('click', () =>
+    document.getElementById('sidebar').classList.toggle('open'));
+document.getElementById('btn-logout').addEventListener('click', async () =>
+    await auth.logout());
+
+// Open add modal
+['btn-open-add', 'btn-open-add2'].forEach(id => {
+    document.getElementById(id).addEventListener('click', openAddModal);
+});
+
+// Close add modal
+['modal-close', 'modal-cancel'].forEach(id => {
+    document.getElementById(id).addEventListener('click', closeAddModal);
+});
+document.getElementById('add-cert-overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('add-cert-overlay')) closeAddModal();
+});
+
+// Close delete modal
+['del-modal-close','del-cancel'].forEach(id => {
+    document.getElementById(id).addEventListener('click', closeDeleteModal);
+});
+
+function openAddModal() {
+    document.getElementById('add-cert-form').reset();
+    document.getElementById('cert-alert').style.display = 'none';
+    ['title','issuer','date','url'].forEach(f => utils.setError('err-'+f, ''));
+    document.getElementById('add-cert-overlay').style.display = 'flex';
+}
+function closeAddModal() {
+    document.getElementById('add-cert-overlay').style.display = 'none';
+}
+
+function openDeleteModal(id, name) {
+    deleteTargetId = id;
+    document.getElementById('del-cert-name').textContent = name;
+    document.getElementById('delete-overlay').style.display = 'flex';
+}
+function closeDeleteModal() {
+    document.getElementById('delete-overlay').style.display = 'none';
+    deleteTargetId = null;
+}
+
+// Delete confirm
+document.getElementById('del-confirm').addEventListener('click', async () => {
+    if (!deleteTargetId) return;
+    const btn = document.getElementById('del-confirm');
+    utils.setLoading(btn, true);
+    try {
+        await api.delete(`/certificates/${deleteTargetId}`);
+        toast.success('Deleted', 'Certificate removed from your profile.');
+        closeDeleteModal();
+        await loadCerts();
+    } catch (err) {
+        toast.error('Error', err.message || 'Failed to delete certificate.');
+    } finally {
+        utils.setLoading(btn, false);
+    }
+});
+
+// Add cert form
+document.getElementById('add-cert-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn    = document.getElementById('btn-add-cert');
+    const title  = document.getElementById('cert-title').value.trim();
+    const issuer = document.getElementById('cert-issuer').value.trim();
+    const date   = document.getElementById('cert-date').value;
+    const url    = document.getElementById('cert-url').value.trim();
+    const desc   = document.getElementById('cert-desc').value.trim();
+
+    // Clear errors
+    ['title','issuer','date','url'].forEach(f => utils.setError('err-'+f, ''));
+    document.getElementById('cert-alert').style.display = 'none';
+
+    let valid = true;
+    if (!title)  { utils.setError('err-title',  'Title is required.');     document.getElementById('cert-title').classList.add('is-invalid');  valid = false; }
+    if (!issuer) { utils.setError('err-issuer', 'Issuer is required.');    document.getElementById('cert-issuer').classList.add('is-invalid'); valid = false; }
+    if (!date)   { utils.setError('err-date',   'Issue date is required.'); document.getElementById('cert-date').classList.add('is-invalid');  valid = false; }
+    if (!valid) return;
+
+    utils.setLoading(btn, true);
+
+    try {
+        await api.post('/certificates', {
+            title,
+            issuer,
+            issue_date:     date,
+            credential_url: url || null,
+            description:    desc || null,
+        });
+        toast.success('Certificate Added!', `"${title}" is now on your profile.`);
+        closeAddModal();
+        await loadCerts();
+    } catch (err) {
+        const alert = document.getElementById('cert-alert');
+        document.getElementById('cert-alert-text').textContent = err.message || 'Failed to add certificate.';
+        alert.style.display = 'flex';
+        if (err.errors) {
+            Object.entries(err.errors).forEach(([field, msg]) => utils.setError('err-'+field, msg));
+        }
+    } finally {
+        utils.setLoading(btn, false);
+    }
+});
+
+// Clear invalid on input
+['cert-title','cert-issuer','cert-date','cert-url'].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('input', () => el.classList.remove('is-invalid'));
+});
+
+async function loadCerts() {
+    try {
+        certificates = await api.get('/certificates');
+        renderCerts();
+    } catch (err) {
+        document.getElementById('cert-grid').innerHTML = `
+            <div class="empty-state" style="grid-column:1/-1;">
+                <div class="empty-state__icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div class="empty-state__title">Failed to load certificates</div>
+                <div class="empty-state__text">${utils.escapeHtml(err.message)}</div>
+                <button class="btn btn--outline btn--sm" onclick="loadCerts()">Retry</button>
+            </div>`;
+    }
+}
+
+function renderCerts() {
+    const grid = document.getElementById('cert-grid');
+    document.getElementById('cert-count-label').textContent =
+        `You have ${certificates.length} certificate${certificates.length !== 1 ? 's' : ''} on your profile.`;
+
+    // Always show the "add" card at the end
+    const items = certificates.map(c => `
+        <div class="cert-card">
+            <div class="cert-card__top">
+                <div class="cert-card__badge"><i class="fa-solid fa-trophy"></i></div>
+                <div style="flex:1; min-width:0;">
+                    <div class="cert-card__title">${utils.escapeHtml(c.title)}</div>
+                    <div class="cert-card__issuer">${utils.escapeHtml(c.issuer)}</div>
+                </div>
+            </div>
+            <div class="cert-card__meta">
+                <span><i class="fa-regular fa-calendar"></i> ${utils.formatDate(c.issue_date)}</span>
+                ${c.credential_url ? `<span><i class="fa-solid fa-link"></i> <a href="${utils.escapeHtml(c.credential_url)}" target="_blank" rel="noopener" style="color:var(--color-primary);">View credential</a></span>` : ''}
+            </div>
+            ${c.description ? `<p class="cert-card__desc">${utils.escapeHtml(utils.truncate(c.description, 110))}</p>` : ''}
+            <div class="cert-card__actions">
+                ${c.credential_url
+                    ? `<a href="${utils.escapeHtml(c.credential_url)}" target="_blank" rel="noopener" class="btn btn--outline btn--sm"><i class="fa-solid fa-link"></i> Verify</a>`
+                    : `<span></span>`}
+                <button class="btn btn--danger-outline btn--sm" onclick="openDeleteModal(${c.id}, '${utils.escapeHtml(c.title).replace(/'/g, "\\'")}')">
+                    <i class="fa-solid fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    `);
+
+    // Add card (always at the end)
+    const addCard = `
+        <div class="cert-add-card" onclick="openAddModal()" role="button" tabindex="0" aria-label="Add certificate">
+            <div class="cert-add-card__icon">+</div>
+            <div class="cert-add-card__title">Add New Certificate</div>
+            <div class="cert-add-card__subtitle">Showcase your achievements<br>to potential employers</div>
+        </div>`;
+
+    grid.innerHTML = items.join('') + addCard;
+}
+</script>
+
+</body>
+</html>

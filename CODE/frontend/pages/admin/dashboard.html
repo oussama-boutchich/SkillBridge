@@ -1,0 +1,304 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SkillBridge — Admin Control Panel.">
+    <title>SkillBridge | Admin Dashboard</title>
+
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../assets/css/variables.css">
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/layout.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+
+    <style>
+        .admin-stat-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: var(--space-4);
+            margin-bottom: var(--space-7);
+        }
+
+        .admin-stat-card {
+            background:    var(--color-surface);
+            border:        1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding:       var(--space-5);
+            text-align:    center;
+            box-shadow:    var(--shadow-xs);
+            transition:    transform var(--transition-fast);
+        }
+
+        .admin-stat-card:hover { transform: translateY(-2px); }
+
+        .admin-stat-icon {
+            font-size:     2rem;
+            margin-bottom: var(--space-2);
+        }
+
+        .admin-stat-value {
+            font-size:   var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            color:       var(--color-text-primary);
+        }
+
+        .admin-stat-label {
+            font-size:  var(--font-size-xs);
+            color:      var(--color-text-muted);
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-6);
+        }
+
+        .log-item {
+            display:       flex;
+            gap:           var(--space-3);
+            padding:       var(--space-3) 0;
+            border-bottom: 1px solid var(--color-border);
+            font-size:     var(--font-size-sm);
+        }
+
+        .log-item:last-child { border-bottom: none; }
+
+        .log-badge {
+            padding:       3px var(--space-2);
+            border-radius: var(--radius-sm);
+            font-size:     var(--font-size-xs);
+            font-weight:   var(--font-weight-semibold);
+            white-space:   nowrap;
+            flex-shrink:   0;
+        }
+        .log-badge--ban    { background: var(--color-danger-bg);   color: var(--color-danger); }
+        .log-badge--unban  { background: var(--color-success-bg);  color: var(--color-success); }
+        .log-badge--delete { background: var(--color-warning-bg);  color: #92400e; }
+        .log-badge--other  { background: var(--color-surface-low); color: var(--color-text-muted); }
+
+        @media (max-width: 1100px) {
+            .admin-stat-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .admin-stat-grid { grid-template-columns: repeat(2, 1fr); }
+            .admin-grid      { grid-template-columns: 1fr; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+</head>
+<body>
+
+<div class="app-shell">
+
+    <!-- ADMIN SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <a href="dashboard.html" class="sidebar__brand">
+            <div class="sidebar__brand-icon">SB</div>
+            <span class="sidebar__brand-text">Admin Panel</span>
+        </a>
+        <nav class="sidebar__nav">
+            <a href="dashboard.html" class="sidebar__link active"><span class="sidebar__icon"><i class="fa-solid fa-gauge-high"></i></span><span class="sidebar__text">Overview</span></a>
+            <a href="users.html"     class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-users"></i></span><span class="sidebar__text">User Management</span></a>
+            <a href="posts.html"     class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-clipboard-list"></i></span><span class="sidebar__text">Post Moderation</span></a>
+            <span class="sidebar__nav-section">System</span>
+            <a href="analytics.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-chart-line"></i></span><span class="sidebar__text">Analytics</span></a>
+            <a href="logs.html"      class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-scroll"></i></span><span class="sidebar__text">Audit Logs</span></a>
+        </nav>
+        <div class="sidebar__footer">
+            <div class="sidebar__user">
+                <div class="sidebar__avatar" id="user-avatar" style="background:var(--color-danger);">A</div>
+                <div class="sidebar__user-info">
+                    <div class="sidebar__user-name" id="user-name">Admin</div>
+                    <div class="sidebar__user-role" style="color:var(--color-danger);">Administrator</div>
+                </div>
+            </div>
+            <button class="btn btn--ghost btn--full" id="btn-logout" style="margin-top:var(--space-2); justify-content:flex-start; color:var(--color-danger); font-size:var(--font-size-xs);"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+        </div>
+    </aside>
+
+    <div class="app-main">
+        <header class="app-header">
+            <div class="header__left">
+                <button class="header__menu-btn" id="menu-btn"><i class="fa-solid fa-bars"></i></button>
+                <span class="header__page-title">Admin Overview</span>
+            </div>
+            <div class="header__right">
+                <span style="font-size:var(--font-size-xs); color:var(--color-danger); font-weight:var(--font-weight-semibold); background:var(--color-danger-bg); padding:var(--space-1) var(--space-3); border-radius:var(--radius-full);"><i class="fa-solid fa-shield-halved"></i> Admin Mode</span>
+                <button class="header__avatar-btn">
+                    <div class="header__avatar avatar avatar--md" style="background:var(--color-danger); color:#fff;" id="header-avatar">A</div>
+                </button>
+            </div>
+        </header>
+
+        <main class="page-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Platform Overview</h1>
+                    <p class="page-subtitle">Real-time analytics and system health.</p>
+                </div>
+                <div style="display:flex; gap:var(--space-3);">
+                    <a href="users.html" class="btn btn--outline">Manage Users</a>
+                    <a href="posts.html" class="btn btn--primary">Moderate Posts</a>
+                </div>
+            </div>
+
+            <!-- Analytics Stats -->
+            <div class="admin-stat-grid">
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon"><i class="fa-solid fa-users"></i></div>
+                    <div class="admin-stat-value" id="stat-total">—</div>
+                    <div class="admin-stat-label">Total Users</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <div class="admin-stat-value" id="stat-students">—</div>
+                    <div class="admin-stat-label">Students</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon"><i class="fa-solid fa-building"></i></div>
+                    <div class="admin-stat-value" id="stat-companies">—</div>
+                    <div class="admin-stat-label">Companies</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+                    <div class="admin-stat-value" id="stat-posts">—</div>
+                    <div class="admin-stat-label">Posts</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon"><i class="fa-solid fa-envelope"></i></div>
+                    <div class="admin-stat-value" id="stat-apps">—</div>
+                    <div class="admin-stat-label">Applications</div>
+                </div>
+            </div>
+
+            <div class="admin-grid">
+
+                <!-- Recent Users -->
+                <div class="card">
+                    <div class="card__header">
+                        <div>
+                            <div class="card__title">Recent Registrations</div>
+                            <div class="card__subtitle">Latest user sign-ups</div>
+                        </div>
+                        <a href="users.html" class="btn btn--ghost btn--sm">View All</a>
+                    </div>
+                    <div id="users-list">
+                        <div class="skeleton" style="height:56px; border-radius:var(--radius-md); margin-bottom:var(--space-2);"></div>
+                        <div class="skeleton" style="height:56px; border-radius:var(--radius-md); margin-bottom:var(--space-2);"></div>
+                        <div class="skeleton" style="height:56px; border-radius:var(--radius-md);"></div>
+                    </div>
+                </div>
+
+                <!-- Audit Logs -->
+                <div class="card">
+                    <div class="card__header">
+                        <div>
+                            <div class="card__title">Recent Admin Actions</div>
+                            <div class="card__subtitle">Audit trail</div>
+                        </div>
+                        <a href="analytics.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-chart-line"></i></span><span class="sidebar__text">Analytics</span></a>
+            <a href="logs.html" class="btn btn--ghost btn--sm">All Logs</a>
+                    </div>
+                    <div id="logs-list">
+                        <div class="skeleton" style="height:52px; border-radius:var(--radius-md); margin-bottom:var(--space-2);"></div>
+                        <div class="skeleton" style="height:52px; border-radius:var(--radius-md);"></div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/utils.js"></script>
+<script>
+let currentUser = null;
+
+(async () => {
+    currentUser = await auth.requireRole('admin');
+    if (!currentUser) return;
+
+    document.getElementById('user-name').textContent = currentUser.full_name;
+    document.getElementById('user-avatar').textContent   = utils.initials(currentUser.full_name);
+    document.getElementById('header-avatar').textContent = utils.initials(currentUser.full_name);
+
+    const [analyticsRes, usersRes, logsRes] = await Promise.allSettled([
+        api.get('/admin/analytics'),
+        api.get('/admin/users'),
+        api.get('/admin/logs'),
+    ]);
+
+    if (analyticsRes.status === 'fulfilled') renderAnalytics(analyticsRes.value);
+    if (usersRes.status === 'fulfilled')     renderUsers(usersRes.value);
+    if (logsRes.status === 'fulfilled')      renderLogs(logsRes.value);
+})();
+
+document.getElementById('menu-btn').addEventListener('click', () =>
+    document.getElementById('sidebar').classList.toggle('open'));
+document.getElementById('btn-logout').addEventListener('click', async () =>
+    await auth.logout());
+
+function renderAnalytics(data) {
+    document.getElementById('stat-total').textContent     = data.total_users        ?? '—';
+    document.getElementById('stat-students').textContent  = data.total_students     ?? '—';
+    document.getElementById('stat-companies').textContent = data.total_companies    ?? '—';
+    document.getElementById('stat-posts').textContent     = data.total_posts        ?? '—';
+    document.getElementById('stat-apps').textContent      = data.total_applications ?? '—';
+}
+
+function renderUsers(users) {
+    const el = document.getElementById('users-list');
+    if (!users || !users.length) {
+        el.innerHTML = '<p style="text-align:center;font-size:var(--font-size-sm);color:var(--color-text-muted);padding:var(--space-4);">No users found.</p>';
+        return;
+    }
+    const roleColors = { student:'var(--color-primary)', company:'var(--color-success)', admin:'var(--color-danger)' };
+    el.innerHTML = users.slice(0, 6).map(u => `
+        <div style="display:flex; align-items:center; gap:var(--space-3); padding:var(--space-3) 0; border-bottom:1px solid var(--color-border);">
+            <div class="avatar avatar--sm" style="background:${roleColors[u.role] || 'var(--color-primary)'}; color:#fff; flex-shrink:0;">
+                ${utils.initials(u.full_name)}
+            </div>
+            <div style="flex:1; min-width:0;">
+                <div style="font-weight:var(--font-weight-medium); font-size:var(--font-size-sm); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${utils.escapeHtml(u.full_name)}</div>
+                <div style="font-size:var(--font-size-xs); color:var(--color-text-muted);">${utils.escapeHtml(u.email)}</div>
+            </div>
+            <div style="display:flex; gap:var(--space-2); align-items:center;">
+                <span class="badge badge--${u.role}">${u.role}</span>
+                ${u.is_banned ? `<span class="badge badge--rejected">Banned</span>` : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderLogs(logs) {
+    const el = document.getElementById('logs-list');
+    if (!logs || !logs.length) {
+        el.innerHTML = '<p style="text-align:center;font-size:var(--font-size-sm);color:var(--color-text-muted);padding:var(--space-4);">No admin actions yet.</p>';
+        return;
+    }
+    const actionClass = a =>
+        a.includes('ban') ? 'ban' :
+        a.includes('unban') ? 'unban' :
+        a.includes('delete') ? 'delete' : 'other';
+
+    el.innerHTML = logs.slice(0, 5).map(log => `
+        <div class="log-item">
+            <span class="log-badge log-badge--${actionClass(log.action)}">${log.action}</span>
+            <div style="flex:1; min-width:0;">
+                <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:var(--font-size-xs);">${utils.escapeHtml(log.description || log.action)}</div>
+                <div style="font-size:var(--font-size-xs); color:var(--color-text-muted); margin-top:2px;">by ${utils.escapeHtml(log.admin_email || 'system')} · ${utils.timeAgo(log.created_at)}</div>
+            </div>
+        </div>
+    `).join('');
+}
+</script>
+
+</body>
+</html>

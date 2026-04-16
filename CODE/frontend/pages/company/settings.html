@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillBridge | Company Settings</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../assets/css/variables.css">
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/layout.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+    <style>
+        .settings-card { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:var(--space-6); margin-bottom:var(--space-5); }
+        .settings-card__header { display:flex; align-items:center; gap:var(--space-3); margin-bottom:var(--space-5); padding-bottom:var(--space-4); border-bottom:1px solid var(--color-border); }
+        .settings-card__header i { color:var(--color-primary); font-size:1.1rem; }
+        .settings-card__title { font-size:var(--font-size-md); font-weight:var(--font-weight-semibold); }
+        .settings-row { display:flex; justify-content:space-between; align-items:center; padding:var(--space-3) 0; border-bottom:1px solid var(--color-border); }
+        .settings-row:last-child { border-bottom:none; }
+        .settings-row__label { font-size:var(--font-size-sm); font-weight:var(--font-weight-medium); }
+        .settings-row__desc { font-size:var(--font-size-xs); color:var(--color-text-muted); margin-top:2px; }
+    </style>
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+        <a href="dashboard.html" class="sidebar__brand">
+            <div class="sidebar__brand-icon">SB</div>
+            <span class="sidebar__brand-text">SkillBridge</span>
+        </a>
+        <nav class="sidebar__nav">
+            <a href="dashboard.html"  class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-gauge-high"></i></span><span class="sidebar__text">Dashboard</span></a>
+            <a href="posts.html"      class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-pen-to-square"></i></span><span class="sidebar__text">My Postings</span></a>
+            <a href="applicants.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-users"></i></span><span class="sidebar__text">Applicants</span></a>
+            <span class="sidebar__nav-section">Account</span>
+            <a href="profile.html"    class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-building"></i></span><span class="sidebar__text">Company Profile</span></a>
+            <a href="notifications.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-bell"></i></span><span class="sidebar__text">Notifications</span></a>
+            <a href="settings.html"   class="sidebar__link active"><span class="sidebar__icon"><i class="fa-solid fa-gear"></i></span><span class="sidebar__text">Settings</span></a>
+        </nav>
+        <div class="sidebar__footer">
+            <div class="sidebar__user">
+                <div class="sidebar__avatar" id="user-avatar">?</div>
+                <div class="sidebar__user-info">
+                    <div class="sidebar__user-name" id="user-name">Loading…</div>
+                    <div class="sidebar__user-role">Company / HR</div>
+                </div>
+            </div>
+            <button class="btn btn--ghost btn--full" id="btn-logout" style="margin-top:var(--space-2); justify-content:flex-start; color:var(--color-danger); font-size:var(--font-size-xs);"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+        </div>
+    </aside>
+
+    <div class="app-main">
+        <header class="app-header">
+            <div class="header__left">
+                <button class="header__menu-btn" id="menu-btn"><i class="fa-solid fa-bars"></i></button>
+                <span class="header__page-title">Settings</span>
+            </div>
+            <div class="header__right">
+                <button class="header__notif-btn" onclick="location.href='notifications.html'"><i class="fa-solid fa-bell"></i></button>
+                <button class="header__avatar-btn" onclick="location.href='profile.html'">
+                    <div class="header__avatar avatar avatar--md" id="header-avatar">?</div>
+                </button>
+            </div>
+        </header>
+
+        <main class="page-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Account Settings</h1>
+                    <p class="page-subtitle">Manage your account preferences.</p>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <div class="settings-card__header">
+                    <i class="fa-solid fa-circle-user"></i>
+                    <div class="settings-card__title">Account Information</div>
+                </div>
+                <div class="settings-row">
+                    <div>
+                        <div class="settings-row__label">Full Name</div>
+                        <div class="settings-row__desc">Your registered full name</div>
+                    </div>
+                    <span id="acc-name" style="font-weight:var(--font-weight-medium); font-size:var(--font-size-sm);">—</span>
+                </div>
+                <div class="settings-row">
+                    <div>
+                        <div class="settings-row__label">Email Address</div>
+                        <div class="settings-row__desc">Your login email</div>
+                    </div>
+                    <span id="acc-email" style="font-weight:var(--font-weight-medium); font-size:var(--font-size-sm);">—</span>
+                </div>
+                <div class="settings-row">
+                    <div>
+                        <div class="settings-row__label">Account Role</div>
+                        <div class="settings-row__desc">Your platform role</div>
+                    </div>
+                    <span class="badge badge--job">Company / HR</span>
+                </div>
+                <div class="settings-row">
+                    <div>
+                        <div class="settings-row__label">Company Profile</div>
+                        <div class="settings-row__desc">Update your company information and branding</div>
+                    </div>
+                    <a href="profile.html" class="btn btn--outline btn--sm"><i class="fa-solid fa-arrow-right"></i> Edit Profile</a>
+                </div>
+            </div>
+
+            <div class="settings-card" style="border-color:var(--color-danger-bg);">
+                <div class="settings-card__header">
+                    <i class="fa-solid fa-triangle-exclamation" style="color:var(--color-danger);"></i>
+                    <div class="settings-card__title" style="color:var(--color-danger);">Danger Zone</div>
+                </div>
+                <div class="settings-row">
+                    <div>
+                        <div class="settings-row__label">Sign Out</div>
+                        <div class="settings-row__desc">End your current session on this device</div>
+                    </div>
+                    <button class="btn btn--danger-outline btn--sm" id="btn-signout"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/utils.js"></script>
+<script>
+(async () => {
+    const user = await auth.requireRole('company');
+    if (!user) return;
+    const init = utils.initials(user.full_name);
+    document.getElementById('user-avatar').textContent   = init;
+    document.getElementById('user-name').textContent     = user.full_name;
+    document.getElementById('header-avatar').textContent = init;
+    document.getElementById('acc-name').textContent      = user.full_name;
+    document.getElementById('acc-email').textContent     = user.email;
+})();
+document.getElementById('menu-btn').addEventListener('click', () =>
+    document.getElementById('sidebar').classList.toggle('open'));
+document.getElementById('btn-logout').addEventListener('click',  async () => await auth.logout());
+document.getElementById('btn-signout').addEventListener('click', async () => await auth.logout());
+</script>
+</body>
+</html>

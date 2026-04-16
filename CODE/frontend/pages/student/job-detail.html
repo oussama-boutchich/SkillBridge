@@ -1,0 +1,414 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SkillBridge — Job detail and application page.">
+    <title>SkillBridge | Opportunity Detail</title>
+
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../assets/css/variables.css">
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/layout.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+
+    <style>
+        .detail-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: var(--space-6);
+            align-items: start;
+        }
+
+        .detail-card {
+            background:    var(--color-surface);
+            border-radius: var(--radius-lg);
+            border:        1px solid var(--color-border);
+            padding:       var(--space-6);
+            box-shadow:    var(--shadow-sm);
+        }
+
+        .detail-header {
+            display:     flex;
+            align-items: flex-start;
+            gap:         var(--space-4);
+            margin-bottom: var(--space-6);
+            padding-bottom: var(--space-6);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .detail-company-logo {
+            width:           64px;
+            height:          64px;
+            border-radius:   var(--radius-lg);
+            background:      var(--color-primary-surface);
+            display:         flex;
+            align-items:     center;
+            justify-content: center;
+            font-size:       var(--font-size-xl);
+            font-weight:     var(--font-weight-bold);
+            color:           var(--color-primary);
+            flex-shrink:     0;
+        }
+
+        .detail-title {
+            font-size:   var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            color:       var(--color-text-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .detail-company-name {
+            font-size:   var(--font-size-md);
+            color:       var(--color-text-secondary);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .detail-meta-row {
+            display:   flex;
+            flex-wrap: wrap;
+            gap:       var(--space-4);
+            margin-top: var(--space-3);
+        }
+
+        .detail-meta-item {
+            display:     flex;
+            align-items: center;
+            gap:         var(--space-2);
+            font-size:   var(--font-size-sm);
+            color:       var(--color-text-muted);
+        }
+
+        .detail-section {
+            margin-bottom: var(--space-6);
+        }
+
+        .detail-section-title {
+            font-size:   var(--font-size-md);
+            font-weight: var(--font-weight-semibold);
+            color:       var(--color-text-primary);
+            margin-bottom: var(--space-3);
+            padding-bottom: var(--space-2);
+            border-bottom: 2px solid var(--color-primary-surface);
+        }
+
+        .detail-section p {
+            font-size:   var(--font-size-sm);
+            line-height: 1.75;
+            color:       var(--color-text-secondary);
+            white-space: pre-wrap;
+        }
+
+        /* Sticky apply card */
+        .apply-card {
+            position: sticky;
+            top: calc(var(--header-height) + var(--space-5));
+        }
+
+        .apply-card__header {
+            text-align: center;
+            margin-bottom: var(--space-5);
+        }
+
+        .apply-card__price {
+            font-size:   var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            color:       var(--color-primary);
+        }
+
+        /* Apply modal textarea */
+        #cover-letter-input { min-height: 140px; }
+
+        @media (max-width: 900px) {
+            .detail-layout { grid-template-columns: 1fr; }
+            .apply-card    { position: static; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <a href="dashboard.html" class="sidebar__brand">
+            <div class="sidebar__brand-icon">SB</div>
+            <span class="sidebar__brand-text">SkillBridge</span>
+        </a>
+        <nav class="sidebar__nav">
+            <a href="dashboard.html"    class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-gauge-high"></i></span><span class="sidebar__text">Dashboard</span></a>
+            <a href="browse-jobs.html"  class="sidebar__link active"><span class="sidebar__icon"><i class="fa-solid fa-magnifying-glass"></i></span><span class="sidebar__text">Browse Opportunities</span></a>
+            <a href="applications.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-file-lines"></i></span><span class="sidebar__text">My Applications</span></a>
+            <a href="certificates.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-trophy"></i></span><span class="sidebar__text">Certificates</span></a>
+            <span class="sidebar__nav-section">Account</span>
+            <a href="profile.html"       class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-circle-user"></i></span><span class="sidebar__text">My Profile</span></a>
+            <a href="notifications.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-bell"></i></span><span class="sidebar__text">Notifications</span></a>
+        </nav>
+        <div class="sidebar__footer">
+            <div class="sidebar__user">
+                <div class="sidebar__avatar" id="user-avatar">?</div>
+                <div class="sidebar__user-info">
+                    <div class="sidebar__user-name" id="user-name">Loading…</div>
+                    <div class="sidebar__user-role">Student</div>
+                </div>
+            </div>
+            <button class="btn btn--ghost btn--full" id="btn-logout" style="margin-top:var(--space-2); justify-content:flex-start; color:var(--color-danger); font-size:var(--font-size-xs);"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="app-main">
+        <header class="app-header">
+            <div class="header__left">
+                <button class="header__menu-btn" id="menu-btn"><i class="fa-solid fa-bars"></i></button>
+                <a href="browse-jobs.html" class="btn btn--ghost btn--sm" style="font-size:var(--font-size-sm);">← Back to Opportunities</a>
+            </div>
+            <div class="header__right">
+                <button class="header__notif-btn" onclick="location.href='notifications.html'"><i class="fa-solid fa-bell"></i></button>
+                <button class="header__avatar-btn" onclick="location.href='profile.html'">
+                    <div class="header__avatar avatar avatar--md" id="header-avatar">?</div>
+                </button>
+            </div>
+        </header>
+
+        <main class="page-content" id="main-content">
+            <!-- Skeleton while loading -->
+            <div id="loading-skeleton">
+                <div class="detail-layout">
+                    <div>
+                        <div class="skeleton" style="height:140px; border-radius:var(--radius-lg); margin-bottom:var(--space-5);"></div>
+                        <div class="skeleton" style="height:300px; border-radius:var(--radius-lg);"></div>
+                    </div>
+                    <div class="skeleton" style="height:320px; border-radius:var(--radius-lg);"></div>
+                </div>
+            </div>
+            <div id="post-detail" style="display:none;"></div>
+        </main>
+    </div>
+</div>
+
+<!-- Apply Modal -->
+<div id="apply-modal-overlay" class="modal-overlay" style="display:none;">
+    <div class="modal">
+        <div class="modal__header">
+            <h2 class="modal__title">Apply for this Position</h2>
+            <button class="modal__close" id="modal-close">×</button>
+        </div>
+
+        <div id="apply-alert" class="alert alert--error" style="display:none;">
+            <span class="alert__icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
+            <span class="alert__body" id="apply-alert-text"></span>
+        </div>
+
+        <p style="font-size:var(--font-size-sm); color:var(--color-text-muted); margin-bottom:var(--space-5);">
+            Your profile information will be shared with the company. Add a cover letter to stand out.
+        </p>
+
+        <form id="apply-form" novalidate>
+            <div class="form-group">
+                <label for="cover-letter-input" class="form-label">Cover Letter <span style="color:var(--color-text-muted); font-weight:400;">(optional)</span></label>
+                <textarea id="cover-letter-input" class="form-control" placeholder="Tell the company why you're a great fit for this role…"></textarea>
+            </div>
+            <div class="modal__footer">
+                <button type="button" class="btn btn--secondary" id="modal-cancel">Cancel</button>
+                <button type="submit" class="btn btn--primary" id="btn-apply">Submit Application</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/utils.js"></script>
+<script>
+let currentUser = null;
+let postId      = null;
+let postData    = null;
+
+(async () => {
+    currentUser = await auth.requireRole('student');
+    if (!currentUser) return;
+
+    const init = utils.initials(currentUser.full_name);
+    document.getElementById('user-avatar').textContent   = init;
+    document.getElementById('user-name').textContent     = currentUser.full_name;
+    document.getElementById('header-avatar').textContent = init;
+
+    postId = utils.getParam('id');
+    if (!postId) {
+        window.location.href = 'browse-jobs.html';
+        return;
+    }
+
+    loadPost();
+})();
+
+document.getElementById('menu-btn').addEventListener('click', () =>
+    document.getElementById('sidebar').classList.toggle('open'));
+
+document.getElementById('btn-logout').addEventListener('click', async () =>
+    await auth.logout());
+
+// Modal controls
+document.getElementById('modal-close').addEventListener('click', closeModal);
+document.getElementById('modal-cancel').addEventListener('click', closeModal);
+document.getElementById('apply-modal-overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('apply-modal-overlay')) closeModal();
+});
+
+function openModal()  { document.getElementById('apply-modal-overlay').style.display = 'flex'; }
+function closeModal() { document.getElementById('apply-modal-overlay').style.display = 'none'; }
+
+// Apply form
+document.getElementById('apply-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn       = document.getElementById('btn-apply');
+    const coverLetter = document.getElementById('cover-letter-input').value.trim();
+
+    document.getElementById('apply-alert').style.display = 'none';
+    utils.setLoading(btn, true);
+
+    try {
+        await api.post('/applications', { post_id: parseInt(postId), cover_letter: coverLetter || null });
+        closeModal();
+        toast.success('Application Submitted!', 'The company will review your application.');
+
+        // Update UI to "Applied"
+        document.getElementById('apply-btn-main') && (document.getElementById('apply-btn-main').textContent = '<i class="fa-solid fa-check"></i> Already Applied');
+        document.getElementById('apply-btn-main') && document.getElementById('apply-btn-main').setAttribute('disabled', 'true');
+        document.getElementById('apply-btn-main') && document.getElementById('apply-btn-main').classList.replace('btn--primary','btn--secondary');
+
+    } catch (err) {
+        const alert = document.getElementById('apply-alert');
+        document.getElementById('apply-alert-text').textContent = err.message || 'Failed to submit application.';
+        alert.style.display = 'flex';
+    } finally {
+        utils.setLoading(btn, false);
+    }
+});
+
+async function loadPost() {
+    try {
+        const post = await api.get(`/posts/${postId}`);
+        postData   = post;
+        renderPost(post);
+    } catch (err) {
+        document.getElementById('loading-skeleton').innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state__icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div class="empty-state__title">Post not found</div>
+                <div class="empty-state__text">${utils.escapeHtml(err.message)}</div>
+                <a href="browse-jobs.html" class="btn btn--outline btn--sm">← Back</a>
+            </div>`;
+    }
+}
+
+function renderPost(p) {
+    const company    = utils.escapeHtml(p.company_name || 'Unknown Company');
+    const initials   = company.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
+    const location   = p.is_remote ? '<i class="fa-solid fa-globe"></i> Remote' : (p.location ? '<i class="fa-solid fa-location-dot"></i> ' + utils.escapeHtml(p.location) : '<i class="fa-solid fa-location-dot"></i> On-site');
+    const deadline   = p.deadline  ? utils.formatDate(p.deadline) : 'No deadline';
+    const posted     = utils.timeAgo(p.created_at);
+    const applicants = parseInt(p.applications_count) || 0;
+    const applied    = !!p.has_applied;
+
+    document.getElementById('loading-skeleton').style.display = 'none';
+    document.getElementById('post-detail').style.display = '';
+    document.title = `SkillBridge | ${p.title}`;
+
+    document.getElementById('post-detail').innerHTML = `
+    <div class="detail-layout">
+
+        <!-- Main Content -->
+        <div>
+            <div class="detail-card">
+                <div class="detail-header">
+                    <div class="detail-company-logo">${initials}</div>
+                    <div style="flex:1; min-width:0;">
+                        <div style="display:flex; align-items:center; gap:var(--space-3); flex-wrap:wrap; margin-bottom:var(--space-2);">
+                            <h1 class="detail-title">${utils.escapeHtml(p.title)}</h1>
+                            <span class="badge badge--${p.type}">${p.type.charAt(0).toUpperCase() + p.type.slice(1)}</span>
+                            <span class="badge badge--${p.status}">${p.status.charAt(0).toUpperCase() + p.status.slice(1)}</span>
+                        </div>
+                        <div class="detail-company-name">${company}</div>
+                        <div class="detail-meta-row">
+                            <span class="detail-meta-item">${location}</span>
+                            <span class="detail-meta-item"><i class="fa-regular fa-calendar"></i> Deadline: ${deadline}</span>
+                            <span class="detail-meta-item"><i class="fa-solid fa-clock"></i> Posted ${posted}</span>
+                            <span class="detail-meta-item"><i class="fa-solid fa-users"></i> ${applicants} applicant${applicants !== 1 ? 's' : ''}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h2 class="detail-section-title">About this Opportunity</h2>
+                    <p>${utils.escapeHtml(p.description)}</p>
+                </div>
+
+                ${p.requirements ? `
+                <div class="detail-section">
+                    <h2 class="detail-section-title">Requirements & Skills</h2>
+                    <p>${utils.escapeHtml(p.requirements)}</p>
+                </div>` : ''}
+
+                <div class="detail-section">
+                    <h2 class="detail-section-title">About ${company}</h2>
+                    <div style="display:flex; gap:var(--space-4); flex-wrap:wrap;">
+                        ${p.industry ? `<span class="detail-meta-item"><i class="fa-solid fa-industry"></i> ${utils.escapeHtml(p.industry)}</span>` : ''}
+                        ${p.company_size ? `<span class="detail-meta-item"><i class="fa-solid fa-users"></i> ${p.company_size} employees</span>` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Apply Sidebar -->
+        <div class="apply-card">
+            <div class="detail-card">
+                <div class="apply-card__header">
+                    <div class="apply-card__price">${p.type === 'challenge' ? '<i class="fa-solid fa-trophy"></i> Challenge' : p.type === 'internship' ? '<i class="fa-solid fa-clipboard-list"></i> Internship' : '<i class="fa-solid fa-briefcase"></i> Full-time Job'}</div>
+                    <p style="font-size:var(--font-size-sm); color:var(--color-text-muted); margin-top:var(--space-2);">
+                        ${p.type === 'challenge' ? 'Participate in this competitive challenge.' : 'Apply and start your career journey.'}
+                    </p>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:var(--space-3); margin-bottom:var(--space-5); font-size:var(--font-size-sm);">
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="color:var(--color-text-muted);">Location</span>
+                        <span style="font-weight:var(--font-weight-medium);">${location}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="color:var(--color-text-muted);">Deadline</span>
+                        <span style="font-weight:var(--font-weight-medium);">${deadline}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="color:var(--color-text-muted);">Applicants</span>
+                        <span style="font-weight:var(--font-weight-medium);">${applicants}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="color:var(--color-text-muted);">Status</span>
+                        <span class="badge badge--${p.status}">${p.status}</span>
+                    </div>
+                </div>
+
+                ${applied
+                    ? `<button class="btn btn--secondary btn--full" disabled><i class="fa-solid fa-check"></i> Already Applied</button>
+                       <p style="text-align:center; font-size:var(--font-size-xs); color:var(--color-success); margin-top:var(--space-2);">You've submitted an application.</p>`
+                    : p.status !== 'active'
+                        ? `<button class="btn btn--secondary btn--full" disabled>Applications Closed</button>`
+                        : `<button class="btn btn--primary btn--full" id="apply-btn-main" onclick="openModal()">Apply Now →</button>`
+                }
+
+                <div style="margin-top:var(--space-4); padding-top:var(--space-4); border-top:1px solid var(--color-border);">
+                    <a href="browse-jobs.html" class="btn btn--ghost btn--full btn--sm" style="justify-content:center;">← Back to Opportunities</a>
+                </div>
+            </div>
+        </div>
+    </div>`;
+}
+</script>
+
+</body>
+</html>

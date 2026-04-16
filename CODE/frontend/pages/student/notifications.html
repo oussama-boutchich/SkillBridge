@@ -1,0 +1,413 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SkillBridge — Your notifications and updates.">
+    <title>SkillBridge | Notifications</title>
+
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../../assets/css/variables.css">
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <link rel="stylesheet" href="../../assets/css/layout.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+
+    <style>
+        .notif-list {
+            display:        flex;
+            flex-direction: column;
+            gap:            0;
+            background:     var(--color-surface);
+            border:         1px solid var(--color-border);
+            border-radius:  var(--radius-lg);
+            overflow:       hidden;
+        }
+
+        .notif-item {
+            display:     flex;
+            align-items: flex-start;
+            gap:         var(--space-4);
+            padding:     var(--space-4) var(--space-5);
+            border-bottom: 1px solid var(--color-border);
+            transition:  background var(--transition-fast);
+            cursor:      pointer;
+            position:    relative;
+        }
+
+        .notif-item:last-child { border-bottom: none; }
+
+        .notif-item:hover { background: var(--color-surface-low); }
+
+        .notif-item--unread {
+            background: linear-gradient(90deg, rgba(0,74,198,0.04) 0%, transparent 100%);
+        }
+
+        .notif-item--unread::before {
+            content:     '';
+            position:    absolute;
+            left:        0;
+            top:         0;
+            bottom:      0;
+            width:       3px;
+            background:  var(--color-primary);
+        }
+
+        .notif-item__icon {
+            width:         40px;
+            height:        40px;
+            flex-shrink:   0;
+            border-radius: var(--radius-full);
+            display:       flex;
+            align-items:   center;
+            justify-content: center;
+            font-size:     1.2rem;
+        }
+
+        .notif-item__icon--accepted   { background: var(--color-success-bg); }
+        .notif-item__icon--rejected   { background: var(--color-danger-bg); }
+        .notif-item__icon--new_app    { background: var(--color-info-bg); }
+        .notif-item__icon--system     { background: var(--color-warning-bg); }
+
+        .notif-item__body { flex: 1; min-width: 0; }
+
+        .notif-item__title {
+            font-size:   var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            color:       var(--color-text-primary);
+            margin-bottom: 3px;
+        }
+
+        .notif-item__msg {
+            font-size:   var(--font-size-xs);
+            color:       var(--color-text-muted);
+            line-height: 1.5;
+        }
+
+        .notif-item__time {
+            font-size:   var(--font-size-xs);
+            color:       var(--color-text-muted);
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-top:  2px;
+        }
+
+        /* Filter tabs */
+        .notif-filter-bar {
+            display:       flex;
+            align-items:   center;
+            justify-content: space-between;
+            margin-bottom: var(--space-4);
+            flex-wrap:     wrap;
+            gap:           var(--space-3);
+        }
+
+        .notif-tabs {
+            display: flex;
+            gap:     var(--space-2);
+        }
+
+        .notif-tab {
+            padding:       var(--space-2) var(--space-4);
+            border-radius: var(--radius-full);
+            font-size:     var(--font-size-xs);
+            font-weight:   var(--font-weight-semibold);
+            cursor:        pointer;
+            border:        1px solid var(--color-border);
+            background:    var(--color-surface);
+            color:         var(--color-text-secondary);
+            transition:    all var(--transition-fast);
+        }
+
+        .notif-tab.active {
+            background:   var(--color-primary);
+            border-color: var(--color-primary);
+            color:        #fff;
+        }
+
+        /* Summary banner */
+        .notif-summary {
+            background:    var(--color-primary-surface);
+            border:        1px solid var(--color-primary-border);
+            border-radius: var(--radius-lg);
+            padding:       var(--space-4) var(--space-5);
+            display:       flex;
+            align-items:   center;
+            gap:           var(--space-4);
+            margin-bottom: var(--space-5);
+        }
+
+        .notif-summary__count {
+            font-size:   var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            color:       var(--color-primary);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <a href="dashboard.html" class="sidebar__brand">
+            <div class="sidebar__brand-icon">SB</div>
+            <span class="sidebar__brand-text">SkillBridge</span>
+        </a>
+        <nav class="sidebar__nav">
+            <a href="dashboard.html"    class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-gauge-high"></i></span><span class="sidebar__text">Dashboard</span></a>
+            <a href="browse-jobs.html"  class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-magnifying-glass"></i></span><span class="sidebar__text">Browse Opportunities</span></a>
+            <a href="applications.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-file-lines"></i></span><span class="sidebar__text">My Applications</span></a>
+            <a href="certificates.html" class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-trophy"></i></span><span class="sidebar__text">Certificates</span></a>
+            <span class="sidebar__nav-section">Account</span>
+            <a href="profile.html"       class="sidebar__link"><span class="sidebar__icon"><i class="fa-solid fa-circle-user"></i></span><span class="sidebar__text">My Profile</span></a>
+            <a href="notifications.html" class="sidebar__link active"><span class="sidebar__icon"><i class="fa-solid fa-bell"></i></span><span class="sidebar__text">Notifications</span></a>
+        </nav>
+        <div class="sidebar__footer">
+            <div class="sidebar__user">
+                <div class="sidebar__avatar" id="user-avatar">?</div>
+                <div class="sidebar__user-info">
+                    <div class="sidebar__user-name" id="user-name">Loading…</div>
+                    <div class="sidebar__user-role">Student</div>
+                </div>
+            </div>
+            <button class="btn btn--ghost btn--full" id="btn-logout" style="margin-top:var(--space-2); justify-content:flex-start; color:var(--color-danger); font-size:var(--font-size-xs);"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="app-main">
+        <header class="app-header">
+            <div class="header__left">
+                <button class="header__menu-btn" id="menu-btn"><i class="fa-solid fa-bars"></i></button>
+                <span class="header__page-title">Notifications</span>
+            </div>
+            <div class="header__right">
+                <button class="header__notif-btn" onclick="location.href='notifications.html'"><i class="fa-solid fa-bell"></i></button>
+                <button class="header__avatar-btn" onclick="location.href='profile.html'">
+                    <div class="header__avatar avatar avatar--md" id="header-avatar">?</div>
+                </button>
+            </div>
+        </header>
+
+        <main class="page-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Notifications</h1>
+                    <p class="page-subtitle" id="notif-subtitle">Loading…</p>
+                </div>
+                <button class="btn btn--secondary" id="btn-read-all"><i class="fa-solid fa-check-double"></i> Mark All Read</button>
+            </div>
+
+            <!-- Unread summary -->
+            <div class="notif-summary" id="notif-summary" style="display:none;">
+                <div class="notif-summary__count" id="unread-count">0</div>
+                <div>
+                    <div style="font-weight:var(--font-weight-semibold); color:var(--color-primary);">Unread notifications</div>
+                    <div style="font-size:var(--font-size-xs); color:var(--color-text-muted);">Stay on top of your application updates.</div>
+                </div>
+            </div>
+
+            <!-- Filter bar -->
+            <div class="notif-filter-bar">
+                <div class="notif-tabs">
+                    <button class="notif-tab active" data-filter="all">All</button>
+                    <button class="notif-tab" data-filter="unread"><i class="fa-solid fa-circle" style="font-size:0.5rem;vertical-align:middle;"></i> Unread</button>
+                </div>
+                <span id="notif-count-label" style="font-size:var(--font-size-xs); color:var(--color-text-muted);"></span>
+            </div>
+
+            <!-- Skeleton -->
+            <div id="notif-skeleton">
+                <div class="skeleton" style="height:72px; border-radius:var(--radius-lg); margin-bottom:var(--space-2);"></div>
+                <div class="skeleton" style="height:72px; border-radius:var(--radius-lg); margin-bottom:var(--space-2);"></div>
+                <div class="skeleton" style="height:72px; border-radius:var(--radius-lg);"></div>
+            </div>
+
+            <!-- Notifications list -->
+            <div id="notif-container" style="display:none;"></div>
+
+            <!-- Load more -->
+            <div style="text-align:center; margin-top:var(--space-6);">
+                <button id="btn-load-more" class="btn btn--secondary" style="display:none;">Load More</button>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/utils.js"></script>
+<script>
+let currentUser   = null;
+let allNotifs     = [];
+let unreadCount   = 0;
+let activeFilter  = 'all';
+let currentPage   = 1;
+let totalPages    = 1;
+
+(async () => {
+    currentUser = await auth.requireRole('student');
+    if (!currentUser) return;
+
+    const init = utils.initials(currentUser.full_name);
+    document.getElementById('user-avatar').textContent   = init;
+    document.getElementById('user-name').textContent     = currentUser.full_name;
+    document.getElementById('header-avatar').textContent = init;
+
+    loadNotifs();
+})();
+
+document.getElementById('menu-btn').addEventListener('click', () =>
+    document.getElementById('sidebar').classList.toggle('open'));
+document.getElementById('btn-logout').addEventListener('click', async () =>
+    await auth.logout());
+
+// Filter tabs
+document.querySelectorAll('.notif-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.notif-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        renderNotifs();
+    });
+});
+
+// Mark all read
+document.getElementById('btn-read-all').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-read-all');
+    utils.setLoading(btn, true);
+    try {
+        await api.patch('/notifications/read-all', {});
+        allNotifs = allNotifs.map(n => ({ ...n, is_read: 1 }));
+        unreadCount = 0;
+        document.getElementById('notif-summary').style.display = 'none';
+        renderNotifs();
+        toast.success('Done!', 'All notifications marked as read.');
+    } catch (err) {
+        toast.error('Error', err.message || 'Failed to mark notifications.');
+    } finally {
+        utils.setLoading(btn, false);
+    }
+});
+
+// Load more
+document.getElementById('btn-load-more').addEventListener('click', () => {
+    currentPage++;
+    loadNotifs(true);
+});
+
+async function loadNotifs(append = false) {
+    if (!append) {
+        document.getElementById('notif-skeleton').style.display = '';
+        document.getElementById('notif-container').style.display = 'none';
+    }
+
+    try {
+        const data   = await api.get('/notifications', { page: currentPage });
+        const notifs = data.items || [];
+        unreadCount  = data.unread || 0;
+        totalPages   = data.pagination?.total_pages || 1;
+
+        if (append) {
+            allNotifs = [...allNotifs, ...notifs];
+        } else {
+            allNotifs = notifs;
+        }
+
+        const totalItems = data.pagination?.total_items || notifs.length;
+        document.getElementById('notif-subtitle').textContent =
+            `You have ${totalItems} notification${totalItems !== 1 ? 's' : ''}`;
+
+        if (unreadCount > 0) {
+            const summaryEl = document.getElementById('notif-summary');
+            summaryEl.style.display = 'flex';
+            document.getElementById('unread-count').textContent = unreadCount;
+        }
+
+        document.getElementById('btn-load-more').style.display =
+            currentPage < totalPages ? '' : 'none';
+
+        renderNotifs();
+        document.getElementById('notif-skeleton').style.display  = 'none';
+        document.getElementById('notif-container').style.display = '';
+
+    } catch (err) {
+        document.getElementById('notif-skeleton').innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state__icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div class="empty-state__title">Failed to load notifications</div>
+                <div class="empty-state__text">${utils.escapeHtml(err.message)}</div>
+                <button class="btn btn--outline btn--sm" onclick="loadNotifs()">Retry</button>
+            </div>`;
+    }
+}
+
+function renderNotifs() {
+    const container = document.getElementById('notif-container');
+    const filtered  = activeFilter === 'unread'
+        ? allNotifs.filter(n => !n.is_read)
+        : allNotifs;
+
+    document.getElementById('notif-count-label').textContent =
+        `Showing ${filtered.length} notification${filtered.length !== 1 ? 's' : ''}`;
+
+    if (!filtered.length) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state__icon"><i class="fa-solid fa-bell"></i></div>
+                <div class="empty-state__title">${activeFilter === 'unread' ? 'All caught up!' : 'No notifications yet'}</div>
+                <div class="empty-state__text">
+                    ${activeFilter === 'unread'
+                        ? 'You have no unread notifications.'
+                        : 'Notifications about your applications will appear here.'}
+                </div>
+            </div>`;
+        return;
+    }
+
+    const iconMap = {
+        application_accepted: { emoji: '<i class="fa-solid fa-party-horn"></i>', cls: 'notif-item__icon--accepted' },
+        application_rejected: { emoji: '<i class="fa-solid fa-clipboard-list"></i>', cls: 'notif-item__icon--rejected' },
+        new_application:      { emoji: '<i class="fa-solid fa-envelope"></i>', cls: 'notif-item__icon--new_app' },
+        system:               { emoji: '<i class="fa-solid fa-gear"></i>', cls: 'notif-item__icon--system' },
+    };
+
+    container.innerHTML = `<div class="notif-list">` + filtered.map(n => {
+        const icon = iconMap[n.type] || { emoji: '<i class="fa-solid fa-bell"></i>', cls: 'notif-item__icon--system' };
+        return `
+        <div class="notif-item ${!n.is_read ? 'notif-item--unread' : ''}"
+             id="notif-${n.id}"
+             onclick="markRead(${n.id})">
+            <div class="notif-item__icon ${icon.cls}">${icon.emoji}</div>
+            <div class="notif-item__body">
+                <div class="notif-item__title">
+                    ${utils.escapeHtml(n.title)}
+                    ${!n.is_read ? `<span style="display:inline-block; width:7px; height:7px; background:var(--color-primary); border-radius:50%; margin-left:5px; vertical-align:middle;"></span>` : ''}
+                </div>
+                <div class="notif-item__msg">${utils.escapeHtml(n.message)}</div>
+            </div>
+            <div class="notif-item__time">${utils.timeAgo(n.created_at)}</div>
+        </div>`;
+    }).join('') + `</div>`;
+}
+
+async function markRead(id) {
+    const notif = allNotifs.find(n => n.id === id);
+    if (!notif || notif.is_read) return;
+
+    try {
+        await api.patch(`/notifications/${id}/read`, {});
+        notif.is_read = 1;
+        unreadCount   = Math.max(0, unreadCount - 1);
+        if (unreadCount === 0) document.getElementById('notif-summary').style.display = 'none';
+        else document.getElementById('unread-count').textContent = unreadCount;
+        renderNotifs();
+    } catch {}
+}
+</script>
+
+</body>
+</html>
